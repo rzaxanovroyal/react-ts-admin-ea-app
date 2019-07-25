@@ -1,0 +1,7 @@
+name: 'Event Admin'
+type: module
+description: 'Admin Interface for managing attendees, attendee and moment tags'
+core: 8.x
+package: 'Custom'
+dependencies:
+  - paragraphs

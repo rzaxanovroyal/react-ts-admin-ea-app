@@ -1,0 +1,61 @@
+<?php
+
+/**
+ * @file
+ * Contains event-admin.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\SettingsCommand;
+
+
+/**
+ * Implements hook_help().
+ */
+// the callback command.
+
+function event_admin_help($route_name, RouteMatchInterface $route_match)
+{
+    switch ($route_name) {
+        // Main module help for the react_event_admin module.
+        case 'help.page.event_admin':
+            $output = '';
+            $output .= '<h3>' . t('About') . '</h3>';
+            $output .= '<p>' . t('Admin Interface for managing attendees, attendee and moment tags') . '</p>';
+            return $output;
+
+        default:
+    }
+}
+
+function event_admin_preprocess_paragraph__event_admin(&$variables)
+{
+    $paragraph = $variables['paragraph'];
+    $variables['#cache']['max-age'] = 0;
+
+    // Set default content of paragraph.
+    $variables['content']['#markup'] = '<div id="event_admin">&nbsp;</div>';
+
+    // Attach required libraries.
+
+    $variables['content']['#attached']['library'] = [
+        'event_admin/event_admin_chunk',
+        'event_admin/event_admin_runtime',
+        'event_admin/event_admin_component',
+    ];
+
+    // Set component settings into drupal settings.
+    $code = \Drupal::request()->get('EventAccessCode');
+    $attendee = $variables['user']->getDisplayName();
+
+    $variables['#attached']['drupalSettings']['eventAccessCode'] = $code;
+    $variables['#attached']['drupalSettings']['attendee'] = $attendee;
+
+    $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    $variables['#attached']['drupalSettings']['language'] = $language;
+
+    $isAnonymous = \Drupal::currentUser()->isAnonymous();
+    $variables['#attached']['drupalSettings']['isAnonymous'] = $isAnonymous;
+}
