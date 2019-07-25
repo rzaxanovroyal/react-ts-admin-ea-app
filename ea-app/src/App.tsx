@@ -1,26 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {PureComponent} from 'react';
+import {connect} from 'react-redux';
+import {RootState} from "./store/store";
+import {setEventCode} from "./store/data/actions";
 
-const App: React.FC = () => {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+interface OwnProps {
 }
 
-export default App;
+type Props = OwnProps & ReturnType<typeof mapStateToProps> & typeof mapDispatchToProps;
+
+type State = Readonly<{}>;
+
+class App extends PureComponent<Props, State> {
+    readonly state: State = {};
+
+    render() {
+        return (
+            <div>1</div>
+        );
+    }
+}
+
+const mapStateToProps = (state: RootState) => ({
+    eventCode: state.data.eventCode
+});
+
+const mapDispatchToProps = {setEventCode};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
