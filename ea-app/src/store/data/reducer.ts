@@ -1,11 +1,14 @@
-import {Reducer} from 'redux';
-import {DataState, SET_EVENT_CODE} from './types';
+import {DataState, SET_EVENT_CODE, SET_LANGUAGE} from './types';
 
 export const initialState: DataState = {
-    eventCode: 'empty'
+    eventCode: 'empty',
+    language: 'empty'
 };
 
-const reducer: Reducer<DataState> = (state = initialState, action) => {
+export function dataReducer(
+    state = initialState,
+    action: any
+): DataState {
     switch (action.type) {
         case SET_EVENT_CODE: {
             return {
@@ -13,10 +16,13 @@ const reducer: Reducer<DataState> = (state = initialState, action) => {
                 eventCode: action.payload.eventCode
             }
         }
-        default: {
-            return state
+        case SET_LANGUAGE: {
+            return {
+                ...state,
+                language: action.payload.language
+            }
         }
+        default:
+            return state
     }
-};
-
-export {reducer as dataReducer}
+}

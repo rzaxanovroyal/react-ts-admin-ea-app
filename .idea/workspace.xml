@@ -2,20 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="10c7cbd4-141d-4287-b86a-c88edca85590" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/maxim.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ea-app/src/shared/theme.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ea-app/src/store/data/actions.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ea-app/src/store/data/reducer.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ea-app/src/store/data/types.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ea-app/src/store/store.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ea-app/src/components/AttendeeComponent.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ea-app/src/locales/en-US.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ea-app/src/locales/fr-FR.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ea-app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea-app/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/App.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ea-app/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea-app/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/index.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ea-app/src/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea-app/src/logo.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/store/data/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/store/data/actions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/store/data/reducer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/store/data/reducer.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/store/data/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/store/data/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/store/store.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/store/store.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ea-app/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/yarn.lock" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -56,7 +53,7 @@
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/ea-app/src/store/data" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/ea-app/src" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
@@ -67,6 +64,7 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\server\EventStory\event-admin\ea-app\src" />
       <recent name="C:\server\EventStory\event-admin\ea-app\src\store\data" />
     </key>
   </component>
@@ -93,7 +91,9 @@
       <option name="presentableId" value="Default" />
       <updated>1564054820108</updated>
       <workItem from="1564054823794" duration="3268000" />
-      <workItem from="1564058262792" duration="9836000" />
+      <workItem from="1564058262792" duration="10514000" />
+      <workItem from="1564123388910" duration="18772000" />
+      <workItem from="1564156247048" duration="1093000" />
     </task>
     <servers />
   </component>
