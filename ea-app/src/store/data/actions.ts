@@ -8,7 +8,7 @@ export interface dataActions {
 
 // Set Event code
 export const setEventCode = (response: any) => (dispatch: Dispatch) => {
-    dispatch({
+    dispatch<dataActions>({
         type: ActionTypes.setEventCode,
         payload: response
     })
