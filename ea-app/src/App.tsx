@@ -1,22 +1,19 @@
 import React, {PureComponent} from 'react';
 import {connect} from 'react-redux';
-import {History} from 'history';
 
 import {RootState} from "./store/store";
-import AttendeeComponent from "./components/AttendeeComponent";
+import AttendeeComponent from "./components/attendee-component";
 import {setEventCode} from "./store/data/actions";
+import {DataState} from "./store/data/reducer";
 
 interface OwnProps {
-    history: History;
+    data: DataState,
+    setEventCode: any
 }
 
-const mapStateToProps = (state: RootState) => ({
-    eventCode: state.data.eventCode
-});
+const mapStateToProps = ({data}: RootState): {data: DataState} => ({data});
 
-const mapDispatchToProps = {setEventCode};
-
-type Props = OwnProps & ReturnType<typeof mapStateToProps> & typeof mapDispatchToProps;
+type Props = OwnProps & ReturnType<typeof mapStateToProps>;
 
 type State = Readonly<{}>;
 
@@ -24,7 +21,6 @@ class App extends PureComponent<Props, State> {
     readonly state: State = {};
 
     render() {
-        const {history}: OwnProps = this.props;
 
         return (
             <div>
@@ -34,4 +30,4 @@ class App extends PureComponent<Props, State> {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default connect(mapStateToProps, {setEventCode})(App);

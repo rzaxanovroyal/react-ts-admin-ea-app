@@ -1,21 +1,19 @@
 import React from 'react';
-import {Provider} from 'react-redux';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 import 'antd/dist/antd.css';
 import {ThemeProvider} from "styled-components";
 import {theme} from "./shared/theme";
-import configureStore, {history} from './store/store';
+import {Provider} from 'react-redux';
+import {store} from "./store/store";
 
 import App from './App';
-
-const store = configureStore();
 
 ReactDOM.render(
     <Provider store={store}>
         <ThemeProvider theme={theme}>
-            <App history={history}/>
+            <App />
         </ThemeProvider>
     </Provider>,
     document.getElementById('root'));

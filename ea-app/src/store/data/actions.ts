@@ -1,5 +1,23 @@
-import {action} from 'typesafe-actions'
-import {SET_EVENT_CODE, SET_LANGUAGE} from './types'
+import {ActionTypes} from './types';
+import {Dispatch} from "redux";
 
-export const setEventCode = () => action(SET_EVENT_CODE);
-export const setLanguage = () => action(SET_LANGUAGE);
+export interface dataActions {
+    type: ActionTypes.setEventCode | ActionTypes.setLanguage,
+    payload: any
+}
+
+// Set Event code
+export const setEventCode = (response: any) => (dispatch: Dispatch) => {
+    dispatch({
+        type: ActionTypes.setEventCode,
+        payload: response
+    })
+};
+
+// Set language
+export const setLanguage = (response: any) => (dispatch: Dispatch) => {
+    dispatch<dataActions>({
+        type: ActionTypes.setLanguage,
+        payload: response
+    })
+};
