@@ -7,8 +7,6 @@ import {setEventCode} from "./store/data/actions";
 import {DataState} from "./store/data/reducer";
 
 interface OwnProps {
-    data: DataState,
-    setEventCode: any
 }
 
 const mapStateToProps = ({data}: RootState): {data: DataState} => ({data});

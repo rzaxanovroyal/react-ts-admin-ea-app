@@ -1,19 +1,21 @@
 import {ActionTypes} from './types';
-import {dataActions} from './actions'
+import {DataActions} from './actions'
 
 export interface DataState {
     eventCode: string,
-    language: string
+    language: string,
+    attendees: []
 }
 
 export const initialState: DataState = {
-    eventCode: 'empty',
-    language: 'empty'
+    eventCode: '589089',//'empty'
+    language: 'empty',
+    attendees: []
 };
 
 export function dataReducer(
     state = initialState,
-    action: dataActions
+    action: DataActions
 ): DataState {
     switch (action.type) {
         case ActionTypes.setEventCode: {
@@ -26,6 +28,12 @@ export function dataReducer(
             return {
                 ...state,
                 language: action.payload
+            }
+        }
+        case ActionTypes.setAttendees: {
+            return {
+                ...state,
+                attendees: action.payload
             }
         }
         default:
