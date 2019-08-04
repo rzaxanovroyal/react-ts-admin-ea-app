@@ -5,8 +5,108 @@ import {fetchPassword, fetchUsername, prodURL} from "../shared/keys";
 import axios from "axios";
 import {DataState} from "../store/data/reducer";
 import {setAttendees} from "../store/data/actions";
-import {Table} from 'antd';
+import {Table, Input, Button, Popconfirm, Form} from 'antd';
 import {ColumnProps} from 'antd/lib/table';
+
+// @ts-ignore
+const EditableContext = React.createContext();
+// @ts-ignore
+const EditableRow = ({form, index, ...props}) => (
+    <EditableContext.Provider value={form}>
+        <tr {...props} />
+    </EditableContext.Provider>
+);
+
+const EditableFormRow = Form.create()(EditableRow);
+
+interface EditableCellProps {
+    record: any,
+    handleSave: any,
+    dataIndex: any,
+    title: any,
+    editable: any,
+    index: any
+}
+
+type EditableCellState = Readonly<{
+    editing: boolean
+}>;
+
+class EditableCell extends PureComponent<EditableCellProps, EditableCellState> {
+    readonly state: EditableCellState = {
+        editing: false,
+    };
+
+    private input: any;
+    toggleEdit = () => {
+        const editing = !this.state.editing;
+        this.setState({editing}, () => {
+            if (editing) {
+                this.input.focus();
+            }
+        });
+    };
+    private form: any;
+    save = (e: any) => {
+        const {record, handleSave} = this.props;
+        this.form.validateFields((error: any, values: any) => {
+            if (error && error[e.currentTarget.id]) {
+                return;
+            }
+            this.toggleEdit();
+            handleSave({...record, ...values});
+        });
+    };
+
+    renderCell = (form: any) => {
+        this.form = form;
+        const {children, dataIndex, record, title} = this.props;
+        const {editing} = this.state;
+        return editing ? (
+            <Form.Item style={{margin: 0}}>
+                {form.getFieldDecorator(dataIndex, {
+                    rules: [
+                        {
+                            required: true,
+                            message: `${title} is required.`,
+                        },
+                    ],
+                    initialValue: record[dataIndex],
+                })(<Input ref={node => (this.input = node)} onPressEnter={this.save} onBlur={this.save}/>)}
+            </Form.Item>
+        ) : (
+            <div
+                className="editable-cell-value-wrap"
+                style={{paddingRight: 24}}
+                onClick={this.toggleEdit}
+            >
+                {children}
+            </div>
+        );
+    };
+
+    render() {
+        const {
+            editable,
+            dataIndex,
+            title,
+            record,
+            index,
+            handleSave,
+            children,
+            ...restProps
+        } = this.props;
+        return (
+            <td {...restProps}>
+                {editable ? (
+                    <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>
+                ) : (
+                    children
+                )}
+            </td>
+        );
+    }
+}
 
 interface OwnProps {
     setAttendees(attendees: object): void
