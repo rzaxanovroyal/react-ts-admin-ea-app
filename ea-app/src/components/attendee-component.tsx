@@ -5,111 +5,81 @@ import {fetchPassword, fetchUsername, prodURL} from "../shared/keys";
 import axios from "axios";
 import {DataState} from "../store/data/reducer";
 import {setAttendees} from "../store/data/actions";
-import {Table, Input, Button, Popconfirm, Form} from 'antd';
-import {ColumnProps} from 'antd/lib/table';
+import {Table, Input, Button, Popconfirm, Form, InputNumber} from 'antd';
+import {FormComponentProps} from 'antd/lib/form';
 
+
+const data = [];
+for (let i = 0; i < 100; i++) {
+    data.push({
+        key: i.toString(),
+        firstName: '',
+        lastName: '',
+        email: '',
+        attendeeTags: [''],
+    });
+}
 // @ts-ignore
 const EditableContext = React.createContext();
-// @ts-ignore
-const EditableRow = ({form, index, ...props}) => (
-    <EditableContext.Provider value={form}>
-        <tr {...props} />
-    </EditableContext.Provider>
-);
 
-const EditableFormRow = Form.create()(EditableRow);
-
-interface EditableCellProps {
-    record: any,
-    handleSave: any,
-    dataIndex: any,
-    title: any,
-    editable: any,
-    index: any
+interface EditableCellProps extends FormComponentProps {
+    editing?: boolean,
+    dataIndex?: any,
+    title?: string,
+    inputType?: any,
+    record?: any,
+    index?: number,
 }
 
-type EditableCellState = Readonly<{
-    editing: boolean
-}>;
+type EditableCellState = Readonly<{}>;
 
 class EditableCell extends PureComponent<EditableCellProps, EditableCellState> {
-    readonly state: EditableCellState = {
-        editing: false,
+    getInput = () => {
+        if (this.props.inputType === 'number') {
+            return <InputNumber/>;
+        }
+        return <Input/>;
     };
 
-    private input: any;
-    toggleEdit = () => {
-        const editing = !this.state.editing;
-        this.setState({editing}, () => {
-            if (editing) {
-                this.input.focus();
-            }
-        });
-    };
-    private form: any;
-    save = (e: any) => {
-        const {record, handleSave} = this.props;
-        this.form.validateFields((error: any, values: any) => {
-            if (error && error[e.currentTarget.id]) {
-                return;
-            }
-            this.toggleEdit();
-            handleSave({...record, ...values});
-        });
-    };
-
-    renderCell = (form: any) => {
-        this.form = form;
-        const {children, dataIndex, record, title} = this.props;
-        const {editing} = this.state;
-        return editing ? (
-            <Form.Item style={{margin: 0}}>
-                {form.getFieldDecorator(dataIndex, {
-                    rules: [
-                        {
-                            required: true,
-                            message: `${title} is required.`,
-                        },
-                    ],
-                    initialValue: record[dataIndex],
-                })(<Input ref={node => (this.input = node)} onPressEnter={this.save} onBlur={this.save}/>)}
-            </Form.Item>
-        ) : (
-            <div
-                className="editable-cell-value-wrap"
-                style={{paddingRight: 24}}
-                onClick={this.toggleEdit}
-            >
-                {children}
-            </div>
-        );
-    };
-
-    render() {
+    renderCell = ({getFieldDecorator}: any) => {
         const {
-            editable,
+            editing,
             dataIndex,
             title,
+            inputType,
             record,
             index,
-            handleSave,
             children,
             ...restProps
         } = this.props;
         return (
             <td {...restProps}>
-                {editable ? (
-                    <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>
+                {editing ? (
+                    <Form.Item style={{margin: 0}}>
+                        {getFieldDecorator(dataIndex, {
+                            rules: [
+                                {
+                                    required: true,
+                                    message: `Please Input ${title}!`,
+                                },
+                            ],
+                            initialValue: record[dataIndex],
+                        })(this.getInput())}
+                    </Form.Item>
                 ) : (
                     children
                 )}
             </td>
         );
+    };
+
+    render() {
+        return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
     }
 }
 
-interface OwnProps {
-    setAttendees(attendees: object): void
+interface OwnProps extends FormComponentProps {
+    setAttendees(attendees: object): void;
 }
 
 const mapStateToProps = ({data}: RootState): { data: DataState } => ({data});
@@ -125,19 +95,136 @@ interface Attendee {
 }
 
 type State = Readonly<{
-    attendeeData: Attendee[]
+    dataSource: Attendee[],
+    editingKey: string
 }>;
 
+declare module 'react' {
+    interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
+        disabled?: boolean;
+    }
+}
+
 class AttendeeComponent extends PureComponent<Props, State> {
-    readonly state: State = {
-        attendeeData: [{
-            key: 0,
-            firstName: '',
-            lastName: '',
-            email: '',
-            attendeeTags: [''],
-        }]
+    private columns: (
+        {
+            title: string;
+            render: (text: any, record: any) => any;
+            key: string,
+            editable?: boolean,
+            dataIndex?: string;
+        } |
+        {
+            dataIndex: string;
+            title: string;
+            key: string,
+            editable: boolean
+        })[];
+
+    constructor(props: Props) {
+        super(props);
+
+        this.columns = [
+            {
+                title: 'Edit',
+                key: 'edit',
+                render: (text: any, record: any) => {
+                    const {editingKey} = this.state;
+                    const editable = this.isEditing(record);
+
+                    return editable ?
+                        (
+                            <span>
+              <EditableContext.Consumer>
+                {(form: any) => (
+                    <a
+                        href="javascript:;"
+                        onClick={() => this.save(form, record.key)}
+                        style={{marginRight: 8}}
+                    >
+                        Save
+                    </a>
+                )}
+              </EditableContext.Consumer>
+              <Popconfirm title="Sure to cancel?" onConfirm={() => this.cancel(record.key)}>
+                <a>Cancel</a>
+              </Popconfirm>
+            </span>
+                        ) :
+                        (
+                            <a disabled={editingKey !== ''} onClick={() => this.edit(record.key)}>
+                                Edit
+                            </a>
+                        );
+                },
+            },
+            {
+                title: 'First name',
+                dataIndex: 'firstName',
+                key: 'firstName',
+                editable: true
+            },
+            {
+                title: 'Last name',
+                dataIndex: 'lastName',
+                key: 'lastName',
+                editable: true,
+            },
+            {
+                title: 'Email',
+                dataIndex: 'email',
+                key: 'email',
+                editable: false
+            }, {
+                title: 'Attendee tags',
+                dataIndex: 'attendeeTags',
+                key: 'attendeeTags',
+                editable: true
+            }
+        ];
+
+        this.state = {
+            dataSource: [{
+                key: 0,
+                firstName: '',
+                lastName: '',
+                email: '',
+                attendeeTags: [''],
+            }],
+            editingKey: ''
+        };
+    }
+
+    isEditing = (record: any) => record.key === this.state.editingKey;
+
+    cancel = (recordKey: any) => {
+        this.setState({editingKey: ''});
     };
+
+    save(form: any, key: any) {
+        form.validateFields((error: any, row: any) => {
+            if (error) {
+                return;
+            }
+            const newData = [...this.state.dataSource];
+            const index = newData.findIndex(item => key === item.key);
+            if (index > -1) {
+                const item = newData[index];
+                newData.splice(index, 1, {
+                    ...item,
+                    ...row,
+                });
+                this.setState({dataSource: newData, editingKey: ''});
+            } else {
+                newData.push(row);
+                this.setState({dataSource: newData, editingKey: ''});
+            }
+        });
+    }
+
+    edit(key: any) {
+        this.setState({editingKey: key});
+    }
 
     private fetchAttendees = (): void => {
         const fetchURL = `${prodURL}/jsonapi/node/attendee/?filter[field_event_reference.field_event_access_code][value]=${this.props.data.eventCode}&fields[user--user]=name,mail&include=field_attendee_tags.vid&fields[node--attendee]=title,field_first_name,field_last_name,field_attendee_tags&fields[taxonomy_term--attendee_tags]=name`;
@@ -203,43 +290,54 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 }
             });
             this.setState({
-                attendeeData: attendeeData
+                dataSource: attendeeData
             })
         }
     }
 
     render() {
-        const columns: ColumnProps<Attendee>[] = [
-            {
-                title: 'Edit',
-                key: 'edit',
-                render: () => <div>Edit</div>
+        const components = {
+            body: {
+                cell: EditableCell,
             },
-            {
-                title: 'First name',
-                dataIndex: 'firstName',
-                key: 'firstName',
-            },
-            {
-                title: 'Last name',
-                dataIndex: 'lastName',
-                key: 'lastName',
-            },
-            {
-                title: 'Email',
-                dataIndex: 'email',
-                key: 'email',
-            }, {
-                title: 'Attendee tags',
-                dataIndex: 'attendeeTags',
-                key: 'attendeeTags'
+        };
+        const columns = this.columns.map(col => {
+            if (!col.editable) {
+                return col;
             }
-        ];
+            return {
+                ...col,
+                onCell: (record: any) => ({
+                    record,
+                    inputType: col.dataIndex === 'text',
+                    dataIndex: col.dataIndex,
+                    title: col.title,
+                    editing: this.isEditing(record),
+                }),
+            };
+        });
 
         return (
-            <Table<Attendee> dataSource={this.state.attendeeData} columns={columns}/>
+            <EditableContext.Provider value={this.props.form}>
+                <Table<Attendee>
+                    components={components}
+                    bordered
+                    dataSource={this.state.dataSource}
+                    columns={columns}
+                    // @ts-ignore
+                    rowClassName="editable-row"
+                    pagination={{
+                        onChange: this.cancel,
+                    }}
+                />
+            </EditableContext.Provider>
+
+
         );
     }
+
 }
 
-export default connect(mapStateToProps, {setAttendees})(AttendeeComponent);
+const WrappedAttendeeComponent = Form.create<EditableCellProps>({name: 'register'})(AttendeeComponent);
+
+export default connect(mapStateToProps, {setAttendees})(WrappedAttendeeComponent);
