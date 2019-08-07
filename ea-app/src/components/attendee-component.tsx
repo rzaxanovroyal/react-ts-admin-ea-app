@@ -5,20 +5,9 @@ import {fetchPassword, fetchUsername, prodURL} from "../shared/keys";
 import axios from "axios";
 import {DataState} from "../store/data/reducer";
 import {setAttendees} from "../store/data/actions";
-import {Table, Input, Button, Popconfirm, Form, InputNumber} from 'antd';
+import {Table, Input, Popconfirm, Form, InputNumber, Icon} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
 
-
-const data = [];
-for (let i = 0; i < 100; i++) {
-    data.push({
-        key: i.toString(),
-        firstName: '',
-        lastName: '',
-        email: '',
-        attendeeTags: [''],
-    });
-}
 // @ts-ignore
 const EditableContext = React.createContext();
 
@@ -26,7 +15,7 @@ interface EditableCellProps extends FormComponentProps {
     editing?: boolean,
     dataIndex?: any,
     title?: string,
-    inputType?: any,
+    inputType?: string,
     record?: any,
     index?: number,
 }
@@ -96,7 +85,7 @@ interface Attendee {
 
 type State = Readonly<{
     dataSource: Attendee[],
-    editingKey: string
+    editingRow: string
 }>;
 
 declare module 'react' {
@@ -129,7 +118,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 title: 'Edit',
                 key: 'edit',
                 render: (text: any, record: any) => {
-                    const {editingKey} = this.state;
+                    const {editingRow} = this.state;
                     const editable = this.isEditing(record);
 
                     return editable ?
@@ -152,8 +141,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
             </span>
                         ) :
                         (
-                            <a disabled={editingKey !== ''} onClick={() => this.edit(record.key)}>
-                                Edit
+                            <a disabled={editingRow !== ''} onClick={() => this.edit(record.key)}>
+                                <Icon type="edit" theme="outlined" style={{fontSize: '18px', color: '#595959'}}/>
                             </a>
                         );
                 },
@@ -191,14 +180,14 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 email: '',
                 attendeeTags: [''],
             }],
-            editingKey: ''
+            editingRow: ''
         };
     }
 
-    isEditing = (record: any) => record.key === this.state.editingKey;
+    isEditing = (record: any) => record.key === this.state.editingRow;
 
     cancel = (recordKey: any) => {
-        this.setState({editingKey: ''});
+        this.setState({editingRow: ''});
     };
 
     save(form: any, key: any) {
@@ -214,16 +203,17 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     ...item,
                     ...row,
                 });
-                this.setState({dataSource: newData, editingKey: ''});
+                this.setState({dataSource: newData, editingRow: ''});
+                console.log(newData);
             } else {
                 newData.push(row);
-                this.setState({dataSource: newData, editingKey: ''});
+                this.setState({dataSource: newData, editingRow: ''});
             }
         });
     }
 
     edit(key: any) {
-        this.setState({editingKey: key});
+        this.setState({editingRow: key});
     }
 
     private fetchAttendees = (): void => {
