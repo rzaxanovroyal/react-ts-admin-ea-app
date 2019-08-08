@@ -68,7 +68,9 @@ class EditableCell extends PureComponent<EditableCellProps, EditableCellState> {
 }
 
 interface OwnProps extends FormComponentProps {
-    setAttendees(attendees: object): void;
+    setAttendees(attendees: object): void,
+
+    XCSRFtoken: string
 }
 
 const mapStateToProps = ({data}: RootState): { data: DataState } => ({data});
@@ -82,7 +84,11 @@ interface Attendee {
     email: string,
     attendeeTags: string[]
 }
-
+interface newAttendee {
+    field_first_name: string,
+    field_last_name: string,
+    field_full_name: string
+}
 type State = Readonly<{
     dataSource: Attendee[],
     editingRow: string
@@ -184,6 +190,34 @@ class AttendeeComponent extends PureComponent<Props, State> {
         };
     }
 
+    private updateAttendees = (attendeeID: string, newAttendee: newAttendee): void => {
+
+        console.log(attendeeID);
+        console.log(newAttendee);
+
+        /*axios({
+            method: 'patch',
+            url: `${prodURL}/jsonapi/node/puzzle/${attendeeID}`,
+            auth: {
+                username: `${fetchUsername}`,
+                password: `${fetchPassword}`
+            },
+            headers: {
+                'Accept': 'application/vnd.api+json',
+                'Content-Type': 'application/vnd.api+json',
+                'X-CSRF-Token': this.props.data.XCSRFtoken
+            },
+            data: {
+                "data": []
+            }
+        })
+            .then(res => {
+                const attendees: object = res.data;
+                this.props.setAttendees(attendees);
+            })
+            .catch(error => console.log(error));*/
+    };
+
     isEditing = (record: any) => record.key === this.state.editingRow;
 
     cancel = (recordKey: any) => {
@@ -197,6 +231,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
             }
             const newData = [...this.state.dataSource];
             const index = newData.findIndex(item => key === item.key);
+            const attendeeID = this.props.data.attendees.data[key].id;
+
             if (index > -1) {
                 const item = newData[index];
                 newData.splice(index, 1, {
@@ -204,7 +240,15 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     ...row,
                 });
                 this.setState({dataSource: newData, editingRow: ''});
-                console.log(newData);
+
+                const updatedAttendee = newData[key];
+                const newAttendee: newAttendee = {
+                   field_first_name: updatedAttendee.firstName,
+                   field_last_name: updatedAttendee.lastName,
+                   field_full_name: `${updatedAttendee.firstName} ${updatedAttendee.lastName}`
+                };
+
+                this.updateAttendees(attendeeID, newAttendee);
             } else {
                 newData.push(row);
                 this.setState({dataSource: newData, editingRow: ''});
@@ -279,6 +323,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     attendeeTags: tagsString
                 }
             });
+
             this.setState({
                 dataSource: attendeeData
             })

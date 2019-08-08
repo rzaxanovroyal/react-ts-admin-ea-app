@@ -4,7 +4,11 @@
     <list default="true" id="10c7cbd4-141d-4287-b86a-c88edca85590" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ea-app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/App.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ea-app/src/components/attendee-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/components/attendee-component.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/store/data/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/store/data/actions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/store/data/reducer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/store/data/reducer.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/store/data/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/store/data/types.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ea-app/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/yarn.lock" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -108,7 +112,8 @@
       <workItem from="1564991010748" duration="15266000" />
       <workItem from="1565074384886" duration="8286000" />
       <workItem from="1565102703817" duration="426000" />
-      <workItem from="1565162808583" duration="5299000" />
+      <workItem from="1565162808583" duration="5901000" />
+      <workItem from="1565252043578" duration="11537000" />
     </task>
     <servers />
   </component>

@@ -1,5 +1,6 @@
 export enum ActionTypes {
     setEventCode,
     setLanguage,
-    setAttendees
+    setAttendees,
+    setXCSRFtoken
 }
