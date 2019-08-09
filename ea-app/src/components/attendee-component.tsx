@@ -5,7 +5,7 @@ import {fetchPassword, fetchUsername, prodURL} from "../shared/keys";
 import axios from "axios";
 import {DataState} from "../store/data/reducer";
 import {setAttendees} from "../store/data/actions";
-import {Table, Input, Popconfirm, Form, InputNumber, Icon} from 'antd';
+import {Table, Input, Popconfirm, Form, InputNumber, Icon, Tag} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
 
 // @ts-ignore
@@ -84,11 +84,13 @@ interface Attendee {
     email: string,
     attendeeTags: string[]
 }
+
 interface newAttendee {
     field_first_name: string,
     field_last_name: string,
     field_full_name: string
 }
+
 type State = Readonly<{
     dataSource: Attendee[],
     editingRow: string
@@ -104,7 +106,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
     private columns: (
         {
             title: string;
-            render: (text: any, record: any) => any;
+            render: (text: any, record: Attendee, index?: number | undefined) => any;
             key: string,
             editable?: boolean,
             dataIndex?: string;
@@ -118,12 +120,13 @@ class AttendeeComponent extends PureComponent<Props, State> {
 
     constructor(props: Props) {
         super(props);
+        let tagPosition = 0;
 
         this.columns = [
             {
                 title: 'Edit',
                 key: 'edit',
-                render: (text: any, record: any) => {
+                render: (text, record) => {
                     const {editingRow} = this.state;
                     const editable = this.isEditing(record);
 
@@ -174,7 +177,32 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 title: 'Attendee tags',
                 dataIndex: 'attendeeTags',
                 key: 'attendeeTags',
-                editable: true
+                editable: false,
+                render: (tags, record, index) => (
+                    <span>
+        {tags.map((tag: string) => {
+            let color = tagPosition === 0 ? 'geekblue' : 'volcano';
+            if (tagPosition === 0) {
+                tagPosition = 1
+            } else if (tagPosition === 1) {
+                tagPosition = 0
+            }
+            return (
+                <Tag color={color} key={tag} closable
+                     onClose={(e: any) => {
+                         e.preventDefault();
+                         this.removeTag(record)
+                     }}> {tag} </Tag>
+            );
+        })}
+                        <Tag key={index} onClick={(e: any) => {
+                            e.preventDefault();
+                            this.addTag(record)
+                        }} style={{background: '#fff', borderStyle: 'dashed'}}>
+                             <Icon type="plus"/> Add Tag
+                        </Tag>
+                    </span>
+                ),
             }
         ];
 
@@ -190,6 +218,12 @@ class AttendeeComponent extends PureComponent<Props, State> {
         };
     }
 
+    private removeTag = (record: Attendee) => {
+        console.log(record);
+    };
+    private addTag = (record: Attendee) => {
+        console.log(record);
+    };
     private updateAttendees = (attendeeID: string, newAttendee: newAttendee): void => {
 
         console.log(attendeeID);
@@ -243,9 +277,9 @@ class AttendeeComponent extends PureComponent<Props, State> {
 
                 const updatedAttendee = newData[key];
                 const newAttendee: newAttendee = {
-                   field_first_name: updatedAttendee.firstName,
-                   field_last_name: updatedAttendee.lastName,
-                   field_full_name: `${updatedAttendee.firstName} ${updatedAttendee.lastName}`
+                    field_first_name: updatedAttendee.firstName,
+                    field_last_name: updatedAttendee.lastName,
+                    field_full_name: `${updatedAttendee.firstName} ${updatedAttendee.lastName}`
                 };
 
                 this.updateAttendees(attendeeID, newAttendee);
@@ -274,11 +308,11 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 'Content-Type': 'application/vnd.api+json',
             }
         })
-            .then(res => {
+            .then((res: any) => {
                 const attendees: object = res.data;
                 this.props.setAttendees(attendees);
             })
-            .catch(error => console.log(error));
+            .catch((error: any) => console.log(error));
     };
 
     componentDidMount(): void {
@@ -313,14 +347,12 @@ class AttendeeComponent extends PureComponent<Props, State> {
                         ))
                 });
 
-                const tagsString = tags.join(', ');
-
                 return {
                     key: index,
                     firstName: attendeeName.attributes.field_first_name,
                     lastName: attendeeName.attributes.field_last_name,
                     email: attendeeName.attributes.title,
-                    attendeeTags: tagsString
+                    attendeeTags: tags
                 }
             });
 
