@@ -3,21 +3,21 @@ import {connect} from 'react-redux';
 import {RootState} from "../store/store";
 import {fetchPassword, fetchUsername, prodURL} from "../shared/keys";
 import axios from "axios";
-import {DataState} from "../store/data/reducer";
-import {setAttendees} from "../store/data/actions";
-import {Table, Input, Popconfirm, Form, InputNumber, Icon, Tag} from 'antd';
+import {DataState, AttendeeData, EventTags} from "../store/data/reducer";
+import {setAttendees, setEventTags} from "../store/data/actions";
+import {Table, Input, Popconfirm, Form, InputNumber, Icon, Tag, Drawer} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
 
 // @ts-ignore
 const EditableContext = React.createContext();
 
 interface EditableCellProps extends FormComponentProps {
-    editing?: boolean,
-    dataIndex?: any,
-    title?: string,
-    inputType?: string,
-    record?: any,
-    index?: number,
+    editing?: boolean;
+    dataIndex?: any;
+    title?: string;
+    inputType?: string;
+    record?: any;
+    index?: number;
 }
 
 type EditableCellState = Readonly<{}>;
@@ -68,9 +68,11 @@ class EditableCell extends PureComponent<EditableCellProps, EditableCellState> {
 }
 
 interface OwnProps extends FormComponentProps {
-    setAttendees(attendees: object): void,
+    setAttendees(attendees: AttendeeData): void;
 
-    XCSRFtoken: string
+    setEventTags(eventTags: EventTags): void;
+
+    XCSRFtoken: string;
 }
 
 const mapStateToProps = ({data}: RootState): { data: DataState } => ({data});
@@ -78,22 +80,30 @@ const mapStateToProps = ({data}: RootState): { data: DataState } => ({data});
 type Props = OwnProps & ReturnType<typeof mapStateToProps>;
 
 interface Attendee {
-    key: number,
-    firstName: string,
-    lastName: string,
-    email: string,
+    key: number;
+    firstName: string;
+    lastName: string;
+    email: string;
     attendeeTags: string[]
 }
 
 interface newAttendee {
-    field_first_name: string,
-    field_last_name: string,
-    field_full_name: string
+    field_first_name: string;
+    field_last_name: string;
+    field_full_name: string;
+}
+
+interface eventTag {
+    tagName: string;
+    tagID: string;
 }
 
 type State = Readonly<{
-    dataSource: Attendee[],
-    editingRow: string
+    dataSource: Attendee[];
+    editingRow: string;
+    visible: boolean;
+    eventTags: eventTag[];
+    selectedTags: any
 }>;
 
 declare module 'react' {
@@ -214,7 +224,10 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 email: '',
                 attendeeTags: [''],
             }],
-            editingRow: ''
+            editingRow: '',
+            visible: false,
+            eventTags: [{tagName: 'empty', tagID: 'empty'}],
+            selectedTags: []
         };
     }
 
@@ -222,6 +235,9 @@ class AttendeeComponent extends PureComponent<Props, State> {
         console.log(record);
     };
     private addTag = (record: Attendee) => {
+        this.setState({
+            visible: true,
+        });
         console.log(record);
     };
     private updateAttendees = (attendeeID: string, newAttendee: newAttendee): void => {
@@ -308,23 +324,59 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 'Content-Type': 'application/vnd.api+json',
             }
         })
-            .then((res: any) => {
-                const attendees: object = res.data;
+            .then((res) => {
+                const attendees = res.data;
                 this.props.setAttendees(attendees);
             })
             .catch((error: any) => console.log(error));
     };
 
+    private fetchEventTags = (): void => {
+        const fetchURL = `${prodURL}/jsonapi/taxonomy_term/attendee_tags?fields[taxonomy_term--attendee_tags]=name&filter[parent.name][value]=${this.props.data.eventCode}`;
+
+        axios({
+            method: 'get',
+            url: `${fetchURL}`,
+            auth: {
+                username: `${fetchUsername}`,
+                password: `${fetchPassword}`
+            },
+            headers: {
+                'Accept': 'application/vnd.api+json',
+                'Content-Type': 'application/vnd.api+json',
+            }
+        })
+            .then((res: any) => {
+                const eventTags = res.data.data;
+                this.props.setEventTags(eventTags);
+            })
+            .catch((error: any) => console.log(error));
+    };
+
+    private onClose = (): void => {
+        this.setState({
+            visible: false,
+        });
+    };
+
+    private handleChange = (tag: any, checked: any) => {
+        const {selectedTags} = this.state;
+        const nextSelectedTags = checked ? [...selectedTags, tag] : selectedTags.filter((t: any) => t !== tag);
+        console.log('You are interested in: ', nextSelectedTags);
+        this.setState({selectedTags: nextSelectedTags});
+    };
+
     componentDidMount(): void {
         this.fetchAttendees();
+        this.fetchEventTags();
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-        const attendees: any = this.props.data.attendees;
+        const attendees = this.props.data.attendees;
 
         if (attendees !== prevProps.data.attendees) {
             const attendeeNames = attendees.data;
-            const attendeeTags: any = attendees.included;
+            const attendeeTags = attendees.included;
 
             const attendeeData = attendeeNames.map((attendeeName: any, index: number) => {
                 let tags: string[] = [];
@@ -333,7 +385,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     return tagID.id
                 });
 
-                attendeeTags.map((attendeeTag: any) => {
+                attendeeTags.map((attendeeTag) => {
                     return (
                         existingTagIDs.map((existingTagID: string) => {
                                 if (attendeeTag.id === existingTagID) {
@@ -360,6 +412,18 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 dataSource: attendeeData
             })
         }
+        const eventTags = this.props.data.eventTags;
+        if (eventTags !== prevProps.data.eventTags) {
+            const allTags = eventTags.map((tag: any) => {
+                return {
+                    tagName: tag.attributes.name,
+                    tagID: tag.id
+                }
+            });
+            this.setState({
+                eventTags: allTags
+            })
+        }
     }
 
     render() {
@@ -383,22 +447,42 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 }),
             };
         });
+        const {CheckableTag} = Tag;
+        const {eventTags, selectedTags} = this.state;
 
         return (
-            <EditableContext.Provider value={this.props.form}>
-                <Table<Attendee>
-                    components={components}
-                    bordered
-                    dataSource={this.state.dataSource}
-                    columns={columns}
-                    // @ts-ignore
-                    rowClassName="editable-row"
-                    pagination={{
-                        onChange: this.cancel,
-                    }}
-                />
-            </EditableContext.Provider>
-
+            <React.Fragment>
+                <EditableContext.Provider value={this.props.form}>
+                    <Table<Attendee>
+                        components={components}
+                        bordered
+                        dataSource={this.state.dataSource}
+                        columns={columns}
+                        // @ts-ignore
+                        rowClassName="editable-row"
+                        pagination={{
+                            onChange: this.cancel,
+                        }}
+                    />
+                </EditableContext.Provider>
+                <Drawer
+                    title="Choose Tags to add:"
+                    placement="top"
+                    closable={false}
+                    onClose={this.onClose}
+                    visible={this.state.visible}
+                >
+                    {eventTags.map((eventTag: any) => (
+                        <CheckableTag
+                            key={eventTag}
+                            checked={selectedTags.indexOf(eventTag) > -1}
+                            onChange={checked => this.handleChange(eventTag, checked)}
+                        >
+                            {eventTag.tagName}
+                        </CheckableTag>
+                    ))}
+                </Drawer>
+            </React.Fragment>
 
         );
     }
@@ -407,4 +491,4 @@ class AttendeeComponent extends PureComponent<Props, State> {
 
 const WrappedAttendeeComponent = Form.create<EditableCellProps>({name: 'register'})(AttendeeComponent);
 
-export default connect(mapStateToProps, {setAttendees})(WrappedAttendeeComponent);
+export default connect(mapStateToProps, {setAttendees, setEventTags})(WrappedAttendeeComponent);
