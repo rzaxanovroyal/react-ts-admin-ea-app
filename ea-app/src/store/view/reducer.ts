@@ -2,11 +2,17 @@ import {ViewActionTypes} from './types';
 import {ViewActions} from './actions';
 
 export interface ViewState {
-    DrawerIsVisible: boolean;
+    DrawerIsVisible:{
+        drawerStatus: boolean;
+        record: any;
+    };
 }
 
 export const initialState: ViewState = {
-    DrawerIsVisible: false,
+    DrawerIsVisible: {
+        drawerStatus: false,
+        record: null
+    },
 };
 
 export function viewReducer(

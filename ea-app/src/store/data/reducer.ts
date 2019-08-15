@@ -1,6 +1,11 @@
 import {ActionTypes} from './types';
 import {DataActions} from './actions';
 
+interface FieldAttendeeTagsData {
+    type: string;
+    id: string;
+}
+
 interface Data {
     id: string;
     attributes: {
@@ -8,6 +13,11 @@ interface Data {
         field_last_name: string;
         title: string;
     };
+    relationships: {
+        field_attendee_tags: {
+            data: FieldAttendeeTagsData[];
+        }
+    }
 }
 
 interface Included {
@@ -48,6 +58,14 @@ export const initialState: DataState = {
                 field_last_name: 'empty',
                 field_first_name: 'empty',
                 title: 'empty',
+            },
+            relationships: {
+                field_attendee_tags: {
+                    data: [{
+                        type: 'empty',
+                        id: 'empty'
+                    }]
+                }
             }
         }],
         included: [{

@@ -24,7 +24,7 @@ const DrawerButtonContainer = styled.div`
 // CSS ends
 
 interface OwnProps {
-    toggleDrawer(DrawerStatus: boolean): void;
+    toggleDrawer(drawerStatus: boolean, record: any): void;
 }
 
 const mapStateToProps = ({data, view}: RootState): { data: DataState, view: ViewState } => ({data, view});
@@ -48,8 +48,8 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
         eventTags: [{tagName: 'empty', tagID: 'empty'}],
     };
 
-    private onClose = (): void => {
-        this.props.toggleDrawer(false);
+    private closeDrawer = (): void => {
+        this.props.toggleDrawer(false, null);
 
     };
 
@@ -58,6 +58,45 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
         const nextSelectedTags = checked ? [...selectedTags, tag] : selectedTags.filter((t: any) => t !== tag);
         console.log('You are interested in: ', nextSelectedTags);
         this.setState({selectedTags: nextSelectedTags});
+    };
+
+    private saveTags = (): void => {
+        const attendeeIndex = this.props.view.DrawerIsVisible.record.key;
+        const attendeeID = this.props.data.attendees.data[attendeeIndex].id;
+        const currentTagsData = this.props.data.attendees.data[attendeeIndex].relationships.field_attendee_tags.data;
+        console.log(currentTagsData);
+
+        /*axios({
+            method: 'patch',
+            url: `${prodURL}/jsonapi/node/attendee/${attendeeID}`,
+            auth: {
+                username: `${fetchUsername}`,
+                password: `${fetchPassword}`
+            },
+            headers: {
+                'Accept': 'application/vnd.api+json',
+                'Content-Type': 'application/vnd.api+json',
+                'X-CSRF-Token': this.props.data.XCSRFtoken
+            },
+            data: {
+                "data": {
+                    "type": "node--attendee",
+                    "id": attendeeID,
+                    "relationships": {
+                        "field_attendee_tags": {
+                            "data": filteredFieldPeople
+                        }
+                    }
+                }
+            }
+        })
+            .then(res => {
+                const attendees: object = res.data;
+                this.props.setAttendees(attendees);
+            })
+            .catch(error => console.log(error));*/
+        this.props.toggleDrawer(false, null);
+
     };
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
@@ -85,8 +124,8 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
                     title="Choose tags to add:"
                     placement="right"
                     closable={false}
-                    onClose={this.onClose}
-                    visible={this.props.view.DrawerIsVisible}
+                    onClose={this.closeDrawer}
+                    visible={this.props.view.DrawerIsVisible.drawerStatus}
                 >
                     {eventTags.map((eventTag: any, index: number) => (
                         <CheckableTag
@@ -99,8 +138,8 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
                     ))}
 
                     <DrawerButtonContainer>
-                        <Button style={{marginRight: 8}} onClick={this.onClose}>Cancel</Button>
-                        <Button onClick={this.onClose} type="primary">Submit</Button>
+                        <Button style={{marginRight: 8}} onClick={this.closeDrawer}>Cancel</Button>
+                        <Button onClick={this.saveTags} type="primary">Submit</Button>
                     </DrawerButtonContainer>
 
                 </Drawer>

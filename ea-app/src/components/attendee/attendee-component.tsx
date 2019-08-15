@@ -76,7 +76,7 @@ interface OwnProps extends FormComponentProps {
 
     setEventTags(eventTags: EventTags): void;
 
-    toggleDrawer(DrawerStatus: boolean): void;
+    toggleDrawer(drawerStatus: boolean, record: any): void;
 }
 
 const mapStateToProps = ({data}: RootState): { data: DataState } => ({data});
@@ -228,8 +228,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
         console.log(record);
     };
     private addTag = (record: Attendee) => {
-        this.props.toggleDrawer(true);
-        console.log(record);
+        this.props.toggleDrawer(true, record);
     };
     private updateAttendees = (attendeeID: string, newAttendee: newAttendee): void => {
 

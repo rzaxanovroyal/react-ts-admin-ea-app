@@ -7,9 +7,12 @@ export interface ViewActions {
 }
 
 // Open/close tags drawer
-export const toggleDrawer = (response: any) => (dispatch: Dispatch) => {
+export const toggleDrawer = (drawerStatus: boolean, record: any ) => (dispatch: Dispatch) => {
     dispatch< ViewActions>({
         type: ViewActionTypes.toggleDrawer,
-        payload: response
+        payload: {
+            drawerStatus: drawerStatus,
+            record: record
+        }
     })
 };
