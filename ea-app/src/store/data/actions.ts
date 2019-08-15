@@ -2,8 +2,8 @@ import {ActionTypes} from './types';
 import {Dispatch} from "redux";
 
 export interface DataActions {
-    type: ActionTypes.setEventCode | ActionTypes.setLanguage | ActionTypes.setAttendees | ActionTypes.setXCSRFtoken | ActionTypes.setEventTags,
-    payload: any
+    type: ActionTypes.setEventCode | ActionTypes.setLanguage | ActionTypes.setAttendees | ActionTypes.setXCSRFtoken | ActionTypes.setEventTags;
+    payload: any;
 }
 
 // Set Event code

@@ -2,7 +2,7 @@ import React, {PureComponent} from 'react';
 import {connect} from 'react-redux';
 
 import {RootState} from "./store/store";
-import AttendeeComponent from "./components/attendee-component";
+import AttendeeComponent from "./components/attendee/attendee-component";
 import {setEventCode, setXCSRFtoken} from "./store/data/actions";
 import {DataState} from "./store/data/reducer";
 import axios from "axios";

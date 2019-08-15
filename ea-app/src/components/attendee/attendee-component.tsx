@@ -1,12 +1,16 @@
 import React, {PureComponent} from 'react';
 import {connect} from 'react-redux';
-import {RootState} from "../store/store";
-import {fetchPassword, fetchUsername, prodURL} from "../shared/keys";
+import {RootState} from "../../store/store";
+import {fetchPassword, fetchUsername, prodURL} from "../../shared/keys";
 import axios from "axios";
-import {DataState, AttendeeData, EventTags} from "../store/data/reducer";
-import {setAttendees, setEventTags} from "../store/data/actions";
-import {Table, Input, Popconfirm, Form, InputNumber, Icon, Tag, Drawer} from 'antd';
+
+import {DataState, AttendeeData, EventTags} from "../../store/data/reducer";
+import {setAttendees, setEventTags} from "../../store/data/actions";
+import {toggleDrawer} from "../../store/view/actions";
+
+import {Table, Input, Popconfirm, Form, InputNumber, Icon, Tag} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
+import DrawerTagsComponent from "./drawer-tags-component"
 
 // @ts-ignore
 const EditableContext = React.createContext();
@@ -72,7 +76,7 @@ interface OwnProps extends FormComponentProps {
 
     setEventTags(eventTags: EventTags): void;
 
-    XCSRFtoken: string;
+    toggleDrawer(DrawerStatus: boolean): void;
 }
 
 const mapStateToProps = ({data}: RootState): { data: DataState } => ({data});
@@ -93,17 +97,9 @@ interface newAttendee {
     field_full_name: string;
 }
 
-interface eventTag {
-    tagName: string;
-    tagID: string;
-}
-
 type State = Readonly<{
     dataSource: Attendee[];
     editingRow: string;
-    visible: boolean;
-    eventTags: eventTag[];
-    selectedTags: any
 }>;
 
 declare module 'react' {
@@ -225,9 +221,6 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 attendeeTags: [''],
             }],
             editingRow: '',
-            visible: false,
-            eventTags: [{tagName: 'empty', tagID: 'empty'}],
-            selectedTags: []
         };
     }
 
@@ -235,9 +228,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
         console.log(record);
     };
     private addTag = (record: Attendee) => {
-        this.setState({
-            visible: true,
-        });
+        this.props.toggleDrawer(true);
         console.log(record);
     };
     private updateAttendees = (attendeeID: string, newAttendee: newAttendee): void => {
@@ -353,19 +344,6 @@ class AttendeeComponent extends PureComponent<Props, State> {
             .catch((error: any) => console.log(error));
     };
 
-    private onClose = (): void => {
-        this.setState({
-            visible: false,
-        });
-    };
-
-    private handleChange = (tag: any, checked: any) => {
-        const {selectedTags} = this.state;
-        const nextSelectedTags = checked ? [...selectedTags, tag] : selectedTags.filter((t: any) => t !== tag);
-        console.log('You are interested in: ', nextSelectedTags);
-        this.setState({selectedTags: nextSelectedTags});
-    };
-
     componentDidMount(): void {
         this.fetchAttendees();
         this.fetchEventTags();
@@ -412,18 +390,6 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 dataSource: attendeeData
             })
         }
-        const eventTags = this.props.data.eventTags;
-        if (eventTags !== prevProps.data.eventTags) {
-            const allTags = eventTags.map((tag: any) => {
-                return {
-                    tagName: tag.attributes.name,
-                    tagID: tag.id
-                }
-            });
-            this.setState({
-                eventTags: allTags
-            })
-        }
     }
 
     render() {
@@ -447,8 +413,6 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 }),
             };
         });
-        const {CheckableTag} = Tag;
-        const {eventTags, selectedTags} = this.state;
 
         return (
             <React.Fragment>
@@ -465,25 +429,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
                         }}
                     />
                 </EditableContext.Provider>
-                <Drawer
-                    title="Choose Tags to add:"
-                    placement="top"
-                    closable={false}
-                    onClose={this.onClose}
-                    visible={this.state.visible}
-                >
-                    {eventTags.map((eventTag: any) => (
-                        <CheckableTag
-                            key={eventTag}
-                            checked={selectedTags.indexOf(eventTag) > -1}
-                            onChange={checked => this.handleChange(eventTag, checked)}
-                        >
-                            {eventTag.tagName}
-                        </CheckableTag>
-                    ))}
-                </Drawer>
+                <DrawerTagsComponent />
             </React.Fragment>
-
         );
     }
 
@@ -491,4 +438,4 @@ class AttendeeComponent extends PureComponent<Props, State> {
 
 const WrappedAttendeeComponent = Form.create<EditableCellProps>({name: 'register'})(AttendeeComponent);
 
-export default connect(mapStateToProps, {setAttendees, setEventTags})(WrappedAttendeeComponent);
+export default connect(mapStateToProps, {setAttendees, setEventTags, toggleDrawer})(WrappedAttendeeComponent);
