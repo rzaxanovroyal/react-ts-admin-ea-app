@@ -86,12 +86,18 @@ const mapStateToProps = ({data, view}: RootState): { data: DataState, view: View
 
 type Props = OwnProps & ReturnType<typeof mapStateToProps>;
 
+export interface eventTag {
+    tagName: string;
+    tagID: string;
+    attendeeID?: string;
+}
+
 interface Attendee {
     key: number;
     firstName: string;
     lastName: string;
     email: string;
-    attendeeTags: string[]
+    attendeeTags: eventTag[]
 }
 
 interface newAttendee {
@@ -189,7 +195,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 editable: false,
                 render: (tags, record, index) => (
                     <span>
-        {tags.map((tag: string) => {
+        {tags.map((tag: eventTag) => {
             let color = tagPosition === 0 ? 'geekblue' : 'volcano';
             if (tagPosition === 0) {
                 tagPosition = 1
@@ -197,11 +203,11 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 tagPosition = 0
             }
             return (
-                <Tag color={color} key={tag} closable
+                <Tag color={color} key={tag.tagID} closable
                      onClose={(e: any) => {
                          e.preventDefault();
-                         this.removeTag(record)
-                     }}> {tag} </Tag>
+                         this.removeTag(record, tag.tagID)
+                     }}> {tag.tagName} </Tag>
             );
         })}
                         <Tag key={index} onClick={(e: any) => {
@@ -221,14 +227,49 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 firstName: '',
                 lastName: '',
                 email: '',
-                attendeeTags: [''],
+                attendeeTags: [{
+                    tagID: 'empty',
+                    tagName: 'empty'
+                }],
             }],
             editingRow: '',
         };
     }
 
-    private removeTag = (record: Attendee) => {
-        console.log(record);
+    private removeTag = (record: Attendee, tagID: string) => {
+        const attendeeID = record.attendeeTags[0].attendeeID;
+        const attendeeIndex = record.key;
+        const currentTags = this.props.data.attendees.data[attendeeIndex].relationships.field_attendee_tags.data;
+        const updatedTags = currentTags.filter(currentTag => currentTag.id !== tagID);
+
+        axios({
+            method: 'patch',
+            url: `${prodURL}/jsonapi/node/attendee/${attendeeID}`,
+            auth: {
+                username: `${fetchUsername}`,
+                password: `${fetchPassword}`
+            },
+            headers: {
+                'Accept': 'application/vnd.api+json',
+                'Content-Type': 'application/vnd.api+json',
+                'X-CSRF-Token': this.props.data.XCSRFtoken
+            },
+            data: {
+                "data": {
+                    "type": "node--attendee",
+                    "id": attendeeID,
+                    "relationships": {
+                        "field_attendee_tags": {
+                            "data": updatedTags
+                        }
+                    }
+                }
+            }
+        })
+            .then(res => {
+                this.fetchAttendees()
+            })
+            .catch(error => console.log(error));
     };
     private addTag = (record: Attendee) => {
         this.props.toggleDrawer(true, record);
@@ -352,7 +393,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
         const attendeeTags = attendees.included;
 
         const attendeeData = attendeeNames.map((attendeeName: any, index: number) => {
-            let tags: string[] = [];
+            let tags: eventTag[] = [];
 
             const existingTagIDs: string[] = attendeeName.relationships.field_attendee_tags.data.map((tagID: any) => {
                 return tagID.id
@@ -363,7 +404,11 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     existingTagIDs.map((existingTagID: string) => {
                             if (attendeeTag.id === existingTagID) {
                                 return (
-                                    tags.push(attendeeTag.attributes.name)
+                                    tags.push({
+                                        tagName: attendeeTag.attributes.name,
+                                        tagID: attendeeTag.id,
+                                        attendeeID: attendeeName.id
+                                    })
                                 )
                             } else {
                                 return null

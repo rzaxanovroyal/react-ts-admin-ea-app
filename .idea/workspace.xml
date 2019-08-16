@@ -5,12 +5,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ea-app/src/components/attendee/attendee-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/components/attendee/attendee-component.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ea-app/src/components/attendee/drawer-tags-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/components/attendee/drawer-tags-component.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea-app/src/store/data/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/store/data/actions.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea-app/src/store/data/reducer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/store/data/reducer.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea-app/src/store/data/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/store/data/types.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea-app/src/store/view/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/store/view/actions.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea-app/src/store/view/reducer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/store/view/reducer.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea-app/src/store/view/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/store/view/types.ts" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -126,7 +120,7 @@
       <workItem from="1565766546246" duration="14161000" />
       <workItem from="1565787903938" duration="10152000" />
       <workItem from="1565851837311" duration="20618000" />
-      <workItem from="1565940810352" duration="20151000" />
+      <workItem from="1565940810352" duration="27270000" />
     </task>
     <servers />
   </component>

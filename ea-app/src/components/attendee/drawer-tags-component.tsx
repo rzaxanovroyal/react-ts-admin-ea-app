@@ -8,6 +8,7 @@ import {DataState} from "../../store/data/reducer";
 import {Tag, Drawer, Button} from 'antd';
 import {ViewState} from "../../store/view/reducer";
 import {toggleDrawer, callMethod} from "../../store/view/actions";
+import {eventTag} from "./attendee-component";
 import _ from 'lodash';
 
 // CSS starts
@@ -33,11 +34,6 @@ interface OwnProps {
 const mapStateToProps = ({data, view}: RootState): { data: DataState, view: ViewState } => ({data, view});
 
 type Props = OwnProps & ReturnType<typeof mapStateToProps>;
-
-interface eventTag {
-    tagName: string;
-    tagID: string;
-}
 
 type State = Readonly<{
     selectedTags: eventTag[];
