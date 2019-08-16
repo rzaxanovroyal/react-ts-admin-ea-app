@@ -1,15 +1,15 @@
-import {ActionTypes} from './types';
+import {SET_LANGUAGE, SET_EVENT_CODE, SET_ATTENDEES, SET_EVENT_TAGS, SET_XCSRF_TOKEN} from './types';
 import {Dispatch} from "redux";
 
 export interface DataActions {
-    type: ActionTypes.setEventCode | ActionTypes.setLanguage | ActionTypes.setAttendees | ActionTypes.setXCSRFtoken | ActionTypes.setEventTags;
+    type: 'SET_LANGUAGE' | 'SET_EVENT_CODE' | 'SET_ATTENDEES' | 'SET_EVENT_TAGS' | 'SET_XCSRF_TOKEN';
     payload: any;
 }
 
 // Set Event code
 export const setEventCode = (response: any) => (dispatch: Dispatch) => {
     dispatch<DataActions>({
-        type: ActionTypes.setEventCode,
+        type: SET_EVENT_CODE,
         payload: response
     })
 };
@@ -17,7 +17,7 @@ export const setEventCode = (response: any) => (dispatch: Dispatch) => {
 // Set language
 export const setLanguage = (response: any) => (dispatch: Dispatch) => {
     dispatch<DataActions>({
-        type: ActionTypes.setLanguage,
+        type: SET_LANGUAGE,
         payload: response
     })
 };
@@ -25,21 +25,21 @@ export const setLanguage = (response: any) => (dispatch: Dispatch) => {
 // Set Attendees
 export const setAttendees = (response: any) => (dispatch: Dispatch) => {
     dispatch<DataActions>({
-        type: ActionTypes.setAttendees,
+        type: SET_ATTENDEES,
         payload: response
     })
 };
 // Set Attendees
 export const setEventTags = (response: any) => (dispatch: Dispatch) => {
     dispatch<DataActions>({
-        type: ActionTypes.setEventTags,
+        type: SET_EVENT_TAGS,
         payload: response
     })
 };
 // Set setXCSRFtoken
 export const setXCSRFtoken = (response: any) => (dispatch: Dispatch) => {
     dispatch<DataActions>({
-        type: ActionTypes.setXCSRFtoken,
+        type: SET_XCSRF_TOKEN,
         payload: response
     })
 };

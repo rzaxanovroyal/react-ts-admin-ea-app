@@ -1,4 +1,4 @@
-import {ActionTypes} from './types';
+import {SET_LANGUAGE, SET_EVENT_CODE, SET_ATTENDEES, SET_EVENT_TAGS, SET_XCSRF_TOKEN} from './types';
 import {DataActions} from './actions';
 
 interface FieldAttendeeTagsData {
@@ -89,31 +89,31 @@ export function dataReducer(
     action: DataActions
 ): DataState {
     switch (action.type) {
-        case ActionTypes.setEventCode: {
+        case SET_EVENT_CODE: {
             return {
                 ...state,
                 eventCode: action.payload
             }
         }
-        case ActionTypes.setLanguage: {
+        case SET_LANGUAGE: {
             return {
                 ...state,
                 language: action.payload
             }
         }
-        case ActionTypes.setAttendees: {
+        case SET_ATTENDEES: {
             return {
                 ...state,
                 attendees: action.payload
             }
         }
-        case ActionTypes.setEventTags: {
+        case SET_EVENT_TAGS: {
             return {
                 ...state,
                 eventTags: action.payload
             }
         }
-        case ActionTypes.setXCSRFtoken: {
+        case SET_XCSRF_TOKEN: {
             return {
                 ...state,
                 XCSRFtoken: action.payload

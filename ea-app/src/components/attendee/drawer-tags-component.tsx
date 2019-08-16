@@ -66,6 +66,7 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
     };
 
     private saveTags = (): void => {
+
         this.setState({isLoading: true});
 
         const {selectedTags} = this.state;
@@ -108,6 +109,7 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
             }
         })
             .then(res => {
+                this.props.callMethod('fetchAttendees');
                 this.props.toggleDrawer(false, null);
                 this.setState({
                     selectedTags: [],

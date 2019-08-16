@@ -6,11 +6,12 @@ import axios from "axios";
 
 import {DataState, AttendeeData, EventTags} from "../../store/data/reducer";
 import {setAttendees, setEventTags} from "../../store/data/actions";
-import {toggleDrawer} from "../../store/view/actions";
+import {toggleDrawer, callMethod} from "../../store/view/actions";
 
 import {Table, Input, Popconfirm, Form, InputNumber, Icon, Tag} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
 import DrawerTagsComponent from "./drawer-tags-component"
+import {ViewState} from "../../store/view/reducer";
 
 // @ts-ignore
 const EditableContext = React.createContext();
@@ -77,9 +78,11 @@ interface OwnProps extends FormComponentProps {
     setEventTags(eventTags: EventTags): void;
 
     toggleDrawer(drawerStatus: boolean, record: any): void;
+
+    callMethod(method: string): void;
 }
 
-const mapStateToProps = ({data}: RootState): { data: DataState } => ({data});
+const mapStateToProps = ({data, view}: RootState): { data: DataState, view: ViewState } => ({data, view});
 
 type Props = OwnProps & ReturnType<typeof mapStateToProps>;
 
@@ -343,51 +346,62 @@ class AttendeeComponent extends PureComponent<Props, State> {
             .catch((error: any) => console.log(error));
     };
 
+    private setDataSource = (): void => {
+        const attendees = this.props.data.attendees;
+        const attendeeNames = attendees.data;
+        const attendeeTags = attendees.included;
+
+        const attendeeData = attendeeNames.map((attendeeName: any, index: number) => {
+            let tags: string[] = [];
+
+            const existingTagIDs: string[] = attendeeName.relationships.field_attendee_tags.data.map((tagID: any) => {
+                return tagID.id
+            });
+
+            attendeeTags.map((attendeeTag) => {
+                return (
+                    existingTagIDs.map((existingTagID: string) => {
+                            if (attendeeTag.id === existingTagID) {
+                                return (
+                                    tags.push(attendeeTag.attributes.name)
+                                )
+                            } else {
+                                return null
+                            }
+                        }
+                    ))
+            });
+
+            return {
+                key: index,
+                firstName: attendeeName.attributes.field_first_name,
+                lastName: attendeeName.attributes.field_last_name,
+                email: attendeeName.attributes.title,
+                attendeeTags: tags
+            }
+        });
+
+        this.setState({
+            dataSource: attendeeData
+        })
+    };
+
     componentDidMount(): void {
         this.fetchAttendees();
         this.fetchEventTags();
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-        const attendees = this.props.data.attendees;
-
-        if (attendees !== prevProps.data.attendees) {
-            const attendeeNames = attendees.data;
-            const attendeeTags = attendees.included;
-
-            const attendeeData = attendeeNames.map((attendeeName: any, index: number) => {
-                let tags: string[] = [];
-
-                const existingTagIDs: string[] = attendeeName.relationships.field_attendee_tags.data.map((tagID: any) => {
-                    return tagID.id
-                });
-
-                attendeeTags.map((attendeeTag) => {
-                    return (
-                        existingTagIDs.map((existingTagID: string) => {
-                                if (attendeeTag.id === existingTagID) {
-                                    return (
-                                        tags.push(attendeeTag.attributes.name)
-                                    )
-                                } else {
-                                    return null
-                                }
-                            }
-                        ))
-                });
-
-                return {
-                    key: index,
-                    firstName: attendeeName.attributes.field_first_name,
-                    lastName: attendeeName.attributes.field_last_name,
-                    email: attendeeName.attributes.title,
-                    attendeeTags: tags
-                }
-            });
-
-            this.setState({
-                dataSource: attendeeData
-            })
+        if (this.props.data.attendees !== prevProps.data.attendees) {
+            this.setDataSource();
+        }
+        if (this.props.view.callMethod !== prevProps.view.callMethod) {
+            switch (this.props.view.callMethod) {
+                case 'fetchAttendees':
+                    this.fetchAttendees();
+                    this.props.callMethod('');
+                    break;
+            }
         }
     }
 
@@ -428,7 +442,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                         }}
                     />
                 </EditableContext.Provider>
-                <DrawerTagsComponent />
+                <DrawerTagsComponent/>
             </React.Fragment>
         );
     }
@@ -437,4 +451,9 @@ class AttendeeComponent extends PureComponent<Props, State> {
 
 const WrappedAttendeeComponent = Form.create<EditableCellProps>({name: 'register'})(AttendeeComponent);
 
-export default connect(mapStateToProps, {setAttendees, setEventTags, toggleDrawer})(WrappedAttendeeComponent);
+export default connect(mapStateToProps, {
+    setAttendees,
+    setEventTags,
+    toggleDrawer,
+    callMethod
+})(WrappedAttendeeComponent);
