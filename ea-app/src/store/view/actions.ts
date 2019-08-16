@@ -2,7 +2,7 @@ import {ViewActionTypes} from './types';
 import {Dispatch} from "redux";
 
 export interface ViewActions {
-    type: ViewActionTypes.toggleDrawer;
+    type: ViewActionTypes.toggleDrawer | ViewActionTypes.callMethod
     payload: any;
 }
 
@@ -14,5 +14,12 @@ export const toggleDrawer = (drawerStatus: boolean, record: any ) => (dispatch: 
             drawerStatus: drawerStatus,
             record: record
         }
+    })
+};
+// Call chosen method
+export const callMethod = (method: string) => (dispatch: Dispatch) => {
+    dispatch< ViewActions>({
+        type: ViewActionTypes.toggleDrawer,
+        payload: method
     })
 };

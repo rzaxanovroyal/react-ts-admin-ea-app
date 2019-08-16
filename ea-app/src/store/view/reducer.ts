@@ -2,10 +2,11 @@ import {ViewActionTypes} from './types';
 import {ViewActions} from './actions';
 
 export interface ViewState {
-    DrawerIsVisible:{
+    DrawerIsVisible: {
         drawerStatus: boolean;
         record: any;
     };
+    callMethod: string;
 }
 
 export const initialState: ViewState = {
@@ -13,6 +14,7 @@ export const initialState: ViewState = {
         drawerStatus: false,
         record: null
     },
+    callMethod: 'empty'
 };
 
 export function viewReducer(
@@ -24,6 +26,12 @@ export function viewReducer(
             return {
                 ...state,
                 DrawerIsVisible: action.payload
+            }
+        }
+        case ViewActionTypes.callMethod: {
+            return {
+                ...state,
+                callMethod: action.payload
             }
         }
         default:
