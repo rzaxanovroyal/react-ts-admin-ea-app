@@ -209,11 +209,51 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 render: (tags, record, index) => (
                     <span>
         {tags.map((tag: eventTag) => {
-            let color = tagPosition === 0 ? 'geekblue' : 'volcano';
-            if (tagPosition === 0) {
-                tagPosition = 1
-            } else if (tagPosition === 1) {
-                tagPosition = 0
+            let color;
+            switch (tagPosition) {
+                case 0:
+                    color = 'volcano';
+                    tagPosition = 1;
+                    break;
+                case 1:
+                    color = 'geekblue';
+                    tagPosition = 2;
+                    break;
+                case 2:
+                    color = 'green';
+                    tagPosition = 3;
+                    break;
+                case 3:
+                    color = 'orange';
+                    tagPosition = 4;
+                    break;
+                case 4:
+                    color = 'cyan';
+                    tagPosition = 5;
+                    break;
+                case 5:
+                    color = 'magenta';
+                    tagPosition = 6;
+                    break;
+                case 6:
+                    color = 'purple';
+                    tagPosition = 7;
+                    break;
+                case 7:
+                    color = 'red';
+                    tagPosition = 8;
+                    break;
+                case 8:
+                    color = 'blue';
+                    tagPosition = 9;
+                    break;
+                case 9:
+                    color = 'gold';
+                    tagPosition = 0;
+                    break;
+                default:
+                    color = 'lime';
+                    break
             }
             return (
                 this.state.isLoading ?

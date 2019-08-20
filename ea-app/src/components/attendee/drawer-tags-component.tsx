@@ -28,6 +28,7 @@ const DrawerButtonContainer = styled.div`
 
 interface OwnProps {
     toggleDrawer(drawerStatus: boolean, record: any): void;
+
     callMethod(method: string): void;
 }
 
@@ -115,18 +116,28 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
             .catch(error => console.log(error));
     };
 
+    private setTagsForCurrentAttendee = (): void => {
+        let uniqueTags: { tagID: any; tagName: string }[];
+        const eventData = this.props.data.eventTags;
+        const attendeeTags = this.props.view.DrawerIsVisible.record.attendeeTags;
+
+        const eventTags = eventData.map((tag: any) => {
+            return {
+                tagName: tag.attributes.name,
+                tagID: tag.id
+            }
+        });
+
+        uniqueTags = eventTags.filter((o: eventTag) => attendeeTags.every((p: eventTag) => !['tagID'].some(k => o.tagID === p.tagID)));
+        this.setState({
+            eventTags: uniqueTags
+        })
+
+    };
+
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-        const eventTags = this.props.data.eventTags;
-        if (eventTags !== prevProps.data.eventTags) {
-            const allTags = eventTags.map((tag: any) => {
-                return {
-                    tagName: tag.attributes.name,
-                    tagID: tag.id
-                }
-            });
-            this.setState({
-                eventTags: allTags
-            })
+        if (this.props.view.DrawerIsVisible !== prevProps.view.DrawerIsVisible && this.props.view.DrawerIsVisible.drawerStatus) {
+            this.setTagsForCurrentAttendee();
         }
     }
 
@@ -154,10 +165,11 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
                 ))}
 
                 <DrawerButtonContainer>
-                    <Button loading={this.state.isLoading} style={{marginRight: 8}} onClick={this.closeDrawer}>Cancel</Button>
+                    <Button loading={this.state.isLoading} style={{marginRight: 8}}
+                            onClick={this.closeDrawer}>Cancel</Button>
 
                     {this.state.selectedTags.length ?
-                    <Button loading={this.state.isLoading} onClick={this.saveTags} type="primary">Submit</Button>
+                        <Button loading={this.state.isLoading} onClick={this.saveTags} type="primary">Submit</Button>
                         : null}
                 </DrawerButtonContainer>
 
