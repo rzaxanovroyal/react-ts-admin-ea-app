@@ -8,7 +8,7 @@ import {DataState, AttendeeData, EventTags} from "../../store/data/reducer";
 import {setAttendees, setEventTags} from "../../store/data/actions";
 import {toggleDrawer, callMethod} from "../../store/view/actions";
 
-import {Table, Input, Popconfirm, Form, InputNumber, Icon, Tag} from 'antd';
+import {Table, Input, Popconfirm, Form, InputNumber, Icon, Tag, Spin} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
 import DrawerTagsComponent from "./drawer-tags-component"
 import {ViewState} from "../../store/view/reducer";
@@ -109,6 +109,7 @@ interface newAttendee {
 type State = Readonly<{
     dataSource: Attendee[];
     editingRow: string;
+    isLoading: boolean;
 }>;
 
 declare module 'react' {
@@ -117,20 +118,25 @@ declare module 'react' {
     }
 }
 
+const spinIcon = <Icon type="loading" style={{fontSize:6, marginLeft: 7, marginRight: 5, verticalAlign: 3}} spin/>;
+
 class AttendeeComponent extends PureComponent<Props, State> {
     private columns: (
         {
             title: string;
             render: (text: any, record: Attendee, index?: number | undefined) => any;
-            key: string,
-            editable?: boolean,
+            key: string;
+            editable?: boolean;
             dataIndex?: string;
         } |
         {
             dataIndex: string;
             title: string;
-            key: string,
-            editable: boolean
+            key: string;
+            editable: boolean;
+            sorter: (a: any, b: any) => any;
+            sortDirections: any;
+            defaultSortOrder?: "ascend" | "descend" | undefined;
         })[];
 
     constructor(props: Props) {
@@ -175,19 +181,26 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 title: 'First name',
                 dataIndex: 'firstName',
                 key: 'firstName',
-                editable: true
+                editable: true,
+                sorter: (a:any, b:any) => a.firstName.localeCompare(b.firstName),
+                sortDirections: ['ascend', 'descend']
             },
             {
                 title: 'Last name',
                 dataIndex: 'lastName',
                 key: 'lastName',
                 editable: true,
+                defaultSortOrder: 'ascend',
+                sorter: (a:any, b:any) => a.lastName.localeCompare(b.lastName),
+                sortDirections: ['ascend', 'descend']
             },
             {
                 title: 'Email',
                 dataIndex: 'email',
                 key: 'email',
-                editable: false
+                editable: false,
+                sorter: (a:any, b:any) => a.email.localeCompare(b.email),
+                sortDirections: ['ascend', 'descend']
             }, {
                 title: 'Attendee tags',
                 dataIndex: 'attendeeTags',
@@ -203,19 +216,23 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 tagPosition = 0
             }
             return (
-                <Tag color={color} key={tag.tagID} closable
-                     onClose={(e: any) => {
-                         e.preventDefault();
-                         this.removeTag(record, tag.tagID)
-                     }}> {tag.tagName} </Tag>
+                this.state.isLoading ?
+                    <Tag key={tag.tagID} style={{background: '#fff', borderStyle: 'dashed'}}>{tag.tagName}<Spin indicator={spinIcon}/></Tag>
+                    :
+                    <Tag color={color} key={tag.tagID} closable
+                         onClose={(e: any) => {
+                             e.preventDefault();
+                             this.removeTag(record, tag.tagID)
+                         }}> {tag.tagName} </Tag>
             );
         })}
-                        <Tag key={index} onClick={(e: any) => {
-                            e.preventDefault();
-                            this.addTag(record)
-                        }} style={{background: '#fff', borderStyle: 'dashed'}}>
-                             <Icon type="plus"/> Add Tag
-                        </Tag>
+
+                            <Tag key={index} onClick={(e: any) => {
+                                e.preventDefault();
+                                this.addTag(record)
+                            }} style={{background: '#fff', borderStyle: 'dashed'}}>
+                                <Icon type="plus"/> Add Tag
+                            </Tag>
                     </span>
                 ),
             }
@@ -233,10 +250,13 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 }],
             }],
             editingRow: '',
+            isLoading: true
         };
     }
 
     private removeTag = (record: Attendee, tagID: string) => {
+        this.setState({isLoading: true});
+
         const attendeeID = record.attendeeTags[0].attendeeID;
         const attendeeIndex = record.key;
         const currentTags = this.props.data.attendees.data[attendeeIndex].relationships.field_attendee_tags.data;
@@ -361,6 +381,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
             .then((res) => {
                 const attendees = res.data;
                 this.props.setAttendees(attendees);
+                this.setState({isLoading: false});
             })
             .catch((error: any) => console.log(error));
     };
