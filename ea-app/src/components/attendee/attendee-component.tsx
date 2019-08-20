@@ -53,7 +53,7 @@ class EditableCell extends PureComponent<EditableCellProps, EditableCellState> {
                         {getFieldDecorator(dataIndex, {
                             rules: [
                                 {
-                                    required: true,
+                                    required: dataIndex === 'firstName',
                                     message: `Please Input ${title}!`,
                                 },
                             ],
@@ -77,7 +77,7 @@ interface OwnProps extends FormComponentProps {
 
     setEventTags(eventTags: EventTags): void;
 
-    toggleDrawer(drawerStatus: boolean, record: any): void;
+    toggleDrawer(drawerStatus: boolean, record: Attendee): void;
 
     callMethod(method: string): void;
 }
@@ -95,14 +95,14 @@ export interface eventTag {
 interface Attendee {
     key: number;
     firstName: string;
-    lastName: string;
+    lastName?: string;
     email: string;
     attendeeTags: eventTag[]
 }
 
 interface newAttendee {
     field_first_name: string;
-    field_last_name: string;
+    field_last_name?: string;
     field_full_name: string;
 }
 
@@ -157,7 +157,6 @@ class AttendeeComponent extends PureComponent<Props, State> {
               <EditableContext.Consumer>
                 {(form: any) => (
                     <a
-                        href="javascript:;"
                         onClick={() => this.save(form, record.key)}
                         style={{marginRight: 8}}
                     >
@@ -285,8 +284,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 lastName: '',
                 email: '',
                 attendeeTags: [{
-                    tagID: 'empty',
-                    tagName: 'empty'
+                    tagID: '',
+                    tagName: ''
                 }],
             }],
             editingRow: '',
@@ -335,13 +334,11 @@ class AttendeeComponent extends PureComponent<Props, State> {
         this.props.toggleDrawer(true, record);
     };
     private updateAttendees = (attendeeID: string, newAttendee: newAttendee): void => {
-
-        console.log(attendeeID);
         console.log(newAttendee);
-
-        /*axios({
+        console.log(attendeeID);
+        axios({
             method: 'patch',
-            url: `${prodURL}/jsonapi/node/puzzle/${attendeeID}`,
+            url: `${prodURL}/jsonapi/node/attendee/${attendeeID}`,
             auth: {
                 username: `${fetchUsername}`,
                 password: `${fetchPassword}`
@@ -352,14 +349,17 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 'X-CSRF-Token': this.props.data.XCSRFtoken
             },
             data: {
-                "data": []
+                "data": {
+                    "type": "node--attendee",
+                    "id": attendeeID,
+                    "attributes": newAttendee
+                }
             }
         })
             .then(res => {
-                const attendees: object = res.data;
-                this.props.setAttendees(attendees);
+                this.fetchAttendees()
             })
-            .catch(error => console.log(error));*/
+            .catch(error => console.log(error));
     };
 
     isEditing = (record: any) => record.key === this.state.editingRow;
@@ -369,6 +369,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
     };
 
     save(form: any, key: any) {
+        this.setState({isLoading: true});
+
         form.validateFields((error: any, row: any) => {
             if (error) {
                 return;
@@ -389,7 +391,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 const newAttendee: newAttendee = {
                     field_first_name: updatedAttendee.firstName,
                     field_last_name: updatedAttendee.lastName,
-                    field_full_name: `${updatedAttendee.firstName} ${updatedAttendee.lastName}`
+                    field_full_name:  updatedAttendee.lastName ? `${updatedAttendee.firstName} ${updatedAttendee.lastName}` : updatedAttendee.firstName
                 };
 
                 this.updateAttendees(attendeeID, newAttendee);

@@ -129,6 +129,7 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
         });
 
         uniqueTags = eventTags.filter((o: eventTag) => attendeeTags.every((p: eventTag) => !['tagID'].some(k => o.tagID === p.tagID)));
+
         this.setState({
             eventTags: uniqueTags
         })

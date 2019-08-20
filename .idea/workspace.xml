@@ -121,7 +121,7 @@
       <workItem from="1565787903938" duration="10152000" />
       <workItem from="1565851837311" duration="20618000" />
       <workItem from="1565940810352" duration="27270000" />
-      <workItem from="1566286665861" duration="20184000" />
+      <workItem from="1566286665861" duration="23580000" />
     </task>
     <servers />
   </component>
@@ -140,5 +140,23 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/ea-app/src/components/attendee/attendee-component.tsx</url>
+          <line>350</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/ea-app/src/components/attendee/attendee-component.tsx</url>
+          <line>335</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
