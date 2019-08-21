@@ -1,5 +1,5 @@
 {
-  "name": "ea-app",
+  "name": "event_admin",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -27,7 +27,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && yarn run build:dist",
+    "build:dist": "cd build && copy static\\js\\main.*.js static\\js\\event_admin.main.js && copy static\\js\\runtime~main.*.js static\\js\\event_admin.runtime~main.js && copy static\\js\\*.chunk.js static\\js\\event_admin.chunk.js && copy static\\css\\main.*.chunk.css static\\css\\event_admin.main.css && copy static\\css\\*.chunk.css static\\css\\event_admin.chunk.css",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

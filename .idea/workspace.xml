@@ -2,9 +2,40 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="10c7cbd4-141d-4287-b86a-c88edca85590" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/ea_app/src/index.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ea_app/src/shared/theme.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea-app/src/components/attendee/attendee-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/components/attendee/attendee-component.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea-app/src/components/attendee/drawer-tags-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea-app/src/components/attendee/drawer-tags-component.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/public/favicon.ico" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/public/favicon.ico" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/public/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/public/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/public/manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/App.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/App.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/App.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/components/attendee/attendee-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/components/attendee/attendee-component.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/components/attendee/drawer-tags-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/components/attendee/drawer-tags-component.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/index.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/locales/en-US.json" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/locales/en-US.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/locales/fr-FR.json" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/locales/fr-FR.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/react-app-env.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/react-app-env.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/serviceWorker.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/serviceWorker.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/shared/keys.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/shared/keys.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/shared/theme.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/store/data/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/store/data/actions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/store/data/reducer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/store/data/reducer.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/store/data/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/store/data/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/store/store.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/store/store.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/store/view/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/store/view/actions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/store/view/reducer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/store/view/reducer.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/src/store/view/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/store/view/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea-app/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/event-admin.info.yml" beforeDir="false" afterPath="$PROJECT_DIR$/event_admin.info.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/event-admin.libraries.yml" beforeDir="false" afterPath="$PROJECT_DIR$/event_admin.libraries.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/event-admin.module" beforeDir="false" afterPath="$PROJECT_DIR$/event_admin.module" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -52,7 +83,7 @@
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
-    <property name="ts.external.directory.path" value="C:\server\EventStory\event-admin\ea-app\node_modules\typescript\lib" />
+    <property name="ts.external.directory.path" value="C:\server\EventStory\event-admin\ea_app\node_modules\typescript\lib" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -121,7 +152,9 @@
       <workItem from="1565787903938" duration="10152000" />
       <workItem from="1565851837311" duration="20618000" />
       <workItem from="1565940810352" duration="27270000" />
-      <workItem from="1566286665861" duration="23580000" />
+      <workItem from="1566286665861" duration="24245000" />
+      <workItem from="1566374719253" duration="13410000" />
+      <workItem from="1566391775097" duration="2156000" />
     </task>
     <servers />
   </component>
@@ -140,23 +173,5 @@
         </entry>
       </map>
     </option>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/ea-app/src/components/attendee/attendee-component.tsx</url>
-          <line>350</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/ea-app/src/components/attendee/attendee-component.tsx</url>
-          <line>335</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

@@ -118,7 +118,7 @@ declare module 'react' {
     }
 }
 
-const spinIcon = <Icon type="loading" style={{fontSize:6, marginLeft: 7, marginRight: 5, verticalAlign: 3}} spin/>;
+const spinIcon = <Icon type="loading" style={{fontSize: 6, marginLeft: 7, marginRight: 5, verticalAlign: 3}} spin/>;
 
 class AttendeeComponent extends PureComponent<Props, State> {
     private columns: (
@@ -171,7 +171,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
                         ) :
                         (
                             <a disabled={editingRow !== ''} onClick={() => this.edit(record.key)}>
-                                <Icon type="edit" theme="outlined" style={{fontSize: '18px', color: '#595959'}}/>
+                                <Icon type="edit" theme="outlined"
+                                      style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>
                             </a>
                         );
                 },
@@ -181,7 +182,11 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 dataIndex: 'firstName',
                 key: 'firstName',
                 editable: true,
-                sorter: (a:any, b:any) => a.firstName.localeCompare(b.firstName),
+                sorter: (a, b) => {
+                    a = a.firstName || 'z';
+                    b = b.firstName || 'z';
+                    return a.localeCompare(b);
+                },
                 sortDirections: ['ascend', 'descend']
             },
             {
@@ -190,7 +195,11 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 key: 'lastName',
                 editable: true,
                 defaultSortOrder: 'ascend',
-                sorter: (a:any, b:any) => a.lastName.localeCompare(b.lastName),
+                sorter: (a, b) => {
+                    a = a.lastName || 'z';
+                    b = b.lastName || 'z';
+                    return a.localeCompare(b);
+                },
                 sortDirections: ['ascend', 'descend']
             },
             {
@@ -198,7 +207,11 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 dataIndex: 'email',
                 key: 'email',
                 editable: false,
-                sorter: (a:any, b:any) => a.email.localeCompare(b.email),
+                sorter: (a, b) => {
+                    a = a.email || 'z';
+                    b = b.email || 'z';
+                    return a.localeCompare(b);
+                },
                 sortDirections: ['ascend', 'descend']
             }, {
                 title: 'Attendee tags',
@@ -256,7 +269,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
             }
             return (
                 this.state.isLoading ?
-                    <Tag key={tag.tagID} style={{background: '#fff', borderStyle: 'dashed'}}>{tag.tagName}<Spin indicator={spinIcon}/></Tag>
+                    <Tag key={tag.tagID} style={{background: '#fff', borderStyle: 'dashed'}}>{tag.tagName}<Spin
+                        indicator={spinIcon}/></Tag>
                     :
                     <Tag color={color} key={tag.tagID} closable
                          onClose={(e: any) => {
@@ -266,10 +280,10 @@ class AttendeeComponent extends PureComponent<Props, State> {
             );
         })}
 
-                            <Tag key={index} onClick={(e: any) => {
-                                e.preventDefault();
-                                this.addTag(record)
-                            }} style={{background: '#fff', borderStyle: 'dashed'}}>
+                        <Tag key={index} onClick={(e: any) => {
+                            e.preventDefault();
+                            this.addTag(record)
+                        }} style={{background: '#fff', borderStyle: 'dashed'}}>
                                 <Icon type="plus"/> Add Tag
                             </Tag>
                     </span>
@@ -334,8 +348,6 @@ class AttendeeComponent extends PureComponent<Props, State> {
         this.props.toggleDrawer(true, record);
     };
     private updateAttendees = (attendeeID: string, newAttendee: newAttendee): void => {
-        console.log(newAttendee);
-        console.log(attendeeID);
         axios({
             method: 'patch',
             url: `${prodURL}/jsonapi/node/attendee/${attendeeID}`,
@@ -357,9 +369,27 @@ class AttendeeComponent extends PureComponent<Props, State> {
             }
         })
             .then(res => {
+                console.log(res);
                 this.fetchAttendees()
             })
-            .catch(error => console.log(error));
+            .catch(function (error) {
+                if (error.response) {
+                    // The request was made and the server responded with a status code
+                    // that falls out of the range of 2xx
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+                } else if (error.request) {
+                    // The request was made but no response was received
+                    // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                    // http.ClientRequest in node.js
+                    console.log(error.request);
+                } else {
+                    // Something happened in setting up the request that triggered an Error
+                    console.log('Error', error.message);
+                }
+                console.log(error.config);
+            });
     };
 
     isEditing = (record: any) => record.key === this.state.editingRow;
@@ -391,7 +421,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 const newAttendee: newAttendee = {
                     field_first_name: updatedAttendee.firstName,
                     field_last_name: updatedAttendee.lastName,
-                    field_full_name:  updatedAttendee.lastName ? `${updatedAttendee.firstName} ${updatedAttendee.lastName}` : updatedAttendee.firstName
+                    field_full_name: updatedAttendee.lastName ? `${updatedAttendee.firstName} ${updatedAttendee.lastName}` : updatedAttendee.firstName
                 };
 
                 this.updateAttendees(attendeeID, newAttendee);
@@ -462,23 +492,25 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 return tagID.id
             });
 
-            attendeeTags.map((attendeeTag) => {
-                return (
-                    existingTagIDs.map((existingTagID: string) => {
-                            if (attendeeTag.id === existingTagID) {
-                                return (
-                                    tags.push({
-                                        tagName: attendeeTag.attributes.name,
-                                        tagID: attendeeTag.id,
-                                        attendeeID: attendeeName.id
-                                    })
-                                )
-                            } else {
-                                return null
+            if (attendeeTags) {
+                attendeeTags.map((attendeeTag) => {
+                    return (
+                        existingTagIDs.map((existingTagID: string) => {
+                                if (attendeeTag.id === existingTagID) {
+                                    return (
+                                        tags.push({
+                                            tagName: attendeeTag.attributes.name,
+                                            tagID: attendeeTag.id,
+                                            attendeeID: attendeeName.id
+                                        })
+                                    )
+                                } else {
+                                    return null
+                                }
                             }
-                        }
-                    ))
-            });
+                        ))
+                })
+            }
 
             return {
                 key: index,

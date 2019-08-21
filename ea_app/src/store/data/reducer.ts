@@ -49,7 +49,7 @@ export interface DataState {
 }
 
 export const initialState: DataState = {
-    eventCode: '589089',//'empty'
+    eventCode: 'empty',
     language: 'empty',
     attendees: {
         data: [{

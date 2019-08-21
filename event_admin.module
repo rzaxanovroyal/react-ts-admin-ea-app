@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains event-admin.module.
+ * Contains event_admin.module.
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
