@@ -57,3 +57,7 @@
 .ant-table-column-sorter-down.off {
   color: rgba(255, 255, 255, 0.4) !important;
 }
+
+.ant-drawer {
+  z-index: 16777200 !important;
+}

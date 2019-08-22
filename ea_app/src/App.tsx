@@ -49,7 +49,7 @@ class App extends PureComponent<Props, State> {
         /*global drupalSettings:true*/
         /*eslint no-undef: "error"*/
         // @ts-ignore
-        this.props.setEventCode('039214');//'039214'//drupalSettings.eventAccessCode
+        this.props.setEventCode(drupalSettings.eventAccessCode);//'039214'//drupalSettings.eventAccessCode
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
