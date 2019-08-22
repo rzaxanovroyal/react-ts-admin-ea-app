@@ -42,6 +42,10 @@
   box-shadow: 1px 1px 8px rgba(20, 20, 20, 1) !important;
 }
 
+.ant-tag {
+  margin: 4px 8px 4px 0 !important;
+}
+
 .ant-tag-checkable:not(.ant-tag-checkable-checked):hover {
   color: rgba(176, 31, 95, 1) !important;
 }

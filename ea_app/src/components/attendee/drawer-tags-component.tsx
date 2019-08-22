@@ -40,6 +40,7 @@ type State = Readonly<{
     selectedTags: eventTag[];
     eventTags: eventTag[];
     isLoading: boolean;
+    allowedTagsPerAttendee: number;
 }>;
 
 class DrawerTagsComponent extends PureComponent<Props, State> {
@@ -47,19 +48,34 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
     readonly state: State = {
         selectedTags: [],
         eventTags: [{tagName: 'empty', tagID: 'empty'}],
-        isLoading: false
+        isLoading: false,
+        allowedTagsPerAttendee: 5
+    };
+
+    private clearAllowedTagsPerAttendee = (): void => {
+        this.setState({allowedTagsPerAttendee: 5});
     };
 
     private closeDrawer = (): void => {
         this.props.toggleDrawer(false, null);
-        this.setState({selectedTags: []});
-
+        this.setState({
+            selectedTags: []
+        });
+        setTimeout(this.clearAllowedTagsPerAttendee, 500);
     };
 
     private handleChange = (tag: any, checked: any) => {
         const {selectedTags} = this.state;
         const nextSelectedTags = checked ? [...selectedTags, tag] : selectedTags.filter((t: any) => t !== tag);
-        this.setState({selectedTags: nextSelectedTags});
+
+        let {allowedTagsPerAttendee} = this.state;
+        let tagsAllowed = allowedTagsPerAttendee - nextSelectedTags.length;
+
+        if (tagsAllowed > -1) {
+            this.setState({
+                selectedTags: nextSelectedTags
+            });
+        }
     };
 
     private saveTags = (): void => {
@@ -112,6 +128,7 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
                     selectedTags: [],
                     isLoading: false
                 });
+                setTimeout(this.clearAllowedTagsPerAttendee, 500);
             })
             .catch(error => console.log(error));
     };
@@ -131,9 +148,9 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
         uniqueTags = eventTags.filter((o: eventTag) => attendeeTags.every((p: eventTag) => !['tagID'].some(k => o.tagID === p.tagID)));
 
         this.setState({
-            eventTags: uniqueTags
+            eventTags: uniqueTags,
+            allowedTagsPerAttendee: this.state.allowedTagsPerAttendee - attendeeTags.length
         })
-
     };
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
@@ -145,11 +162,11 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
     render() {
 
         const {CheckableTag} = Tag;
-        const {eventTags, selectedTags} = this.state;
+        const {eventTags, selectedTags, allowedTagsPerAttendee} = this.state;
 
         return (
             <Drawer
-                title="Choose tags to add:"
+                title={`Choose tags to add (${allowedTagsPerAttendee} max)`}
                 placement="right"
                 closable={false}
                 onClose={this.closeDrawer}
