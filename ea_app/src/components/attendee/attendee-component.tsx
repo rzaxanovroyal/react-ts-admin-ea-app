@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react';
+import React, {PureComponent, AriaAttributes, DOMAttributes} from 'react';
 import {connect} from 'react-redux';
 import {RootState} from "../../store/store";
 import {fetchPassword, fetchUsername, prodURL} from "../../shared/keys";
@@ -8,13 +8,20 @@ import {DataState, AttendeeData, EventTags} from "../../store/data/reducer";
 import {setAttendees, setEventTags} from "../../store/data/actions";
 import {toggleDrawer, callMethod} from "../../store/view/actions";
 
-import {Table, Input, Popconfirm, Form, InputNumber, Icon, Tag, Spin} from 'antd';
+import {Table, Input, Popconfirm, Form, InputNumber, Icon, Tag, Spin, Button} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
 import DrawerTagsComponent from "./drawer-tags-component"
 import {ViewState} from "../../store/view/reducer";
 
 // @ts-ignore
 const EditableContext = React.createContext();
+// @ts-ignore
+const EditableRow = ({form, index, ...props}) => (
+    <EditableContext.Provider value={form}>
+        <tr {...props} />
+    </EditableContext.Provider>
+);
+const EditableFormRow = Form.create()(EditableRow);
 
 interface EditableCellProps extends FormComponentProps {
     editing?: boolean;
@@ -109,6 +116,7 @@ interface newAttendee {
 type State = Readonly<{
     dataSource: Attendee[];
     editingRow: string;
+    count: number;
     isLoading: boolean;
 }>;
 
@@ -151,30 +159,42 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     const {editingRow} = this.state;
                     const editable = this.isEditing(record);
 
-                    return editable ?
-                        (
-                            <span>
+                    if (record.key === 0) {
+                        return editable ?
+                            (<span>
               <EditableContext.Consumer>
                 {(form: any) => (
                     <a
                         onClick={() => this.save(form, record.key)}
                         style={{marginRight: 8}}
-                    >
-                        Save
-                    </a>
-                )}
+                    > Save </a>)}
               </EditableContext.Consumer>
-              <Popconfirm title="Sure to cancel?" onConfirm={() => this.cancel(record.key)}>
-                <a>Cancel</a>
-              </Popconfirm>
-            </span>
-                        ) :
-                        (
-                            <a disabled={editingRow !== ''} onClick={() => this.edit(record.key)}>
-                                <Icon type="edit" theme="outlined"
+
+              <Popconfirm title="Sure to cancel?" onConfirm={() => this.cancel(record.key)}><a> Cancel </a></Popconfirm>
+            </span>)
+                            :
+                            (<a disabled={editingRow !== ''} onClick={() => this.edit(record.key)}>
+                                <Icon type="user-add" theme="outlined"
                                       style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>
-                            </a>
-                        );
+                            </a>);
+                    }
+                    return editable ?
+                        (<span>
+              <EditableContext.Consumer>
+                {(form: any) => (
+                    <a
+                        onClick={() => this.save(form, record.key)}
+                        style={{marginRight: 8}}
+                    > Save </a>)}
+              </EditableContext.Consumer>
+
+              <Popconfirm title="Sure to cancel?" onConfirm={() => this.cancel(record.key)}><a> Cancel </a></Popconfirm>
+            </span>)
+                        :
+                        (<a disabled={editingRow !== ''} onClick={() => this.edit(record.key)}>
+                            <Icon type="edit" theme="outlined"
+                                  style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>
+                        </a>);
                 },
             },
             {
@@ -303,6 +323,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 }],
             }],
             editingRow: '',
+            count: 2,
             isLoading: true
         };
     }
@@ -511,7 +532,6 @@ class AttendeeComponent extends PureComponent<Props, State> {
                         ))
                 })
             }
-
             return {
                 key: index,
                 firstName: attendeeName.attributes.field_first_name,
@@ -520,10 +540,26 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 attendeeTags: tags
             }
         });
+        const dataSource = attendeeData;
 
         this.setState({
-            dataSource: attendeeData
+            dataSource: dataSource
         })
+    };
+
+    private handleAdd = (): void => {
+        const {count, dataSource} = this.state;
+        const newData = {
+            key: -1,
+            firstName: '#Enter First name',
+            lastName: '#Enter Last name',
+            email: '#Enter e-mail',
+            attendeeTags: []
+        };
+        this.setState({
+            dataSource: [...dataSource, newData],
+            count: count + 1,
+        });
     };
 
     componentDidMount(): void {
@@ -548,6 +584,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
     render() {
         const components = {
             body: {
+                row: EditableFormRow,
                 cell: EditableCell,
             },
         };
@@ -569,6 +606,10 @@ class AttendeeComponent extends PureComponent<Props, State> {
 
         return (
             <React.Fragment>
+                <Button onClick={this.handleAdd} type="dashed" style={{marginBottom: 16}}>
+                    <Icon type="plus" theme="outlined"
+                          style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>Add row
+                </Button>
                 <EditableContext.Provider value={this.props.form}>
                     <Table<Attendee>
                         components={components}

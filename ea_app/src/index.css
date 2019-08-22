@@ -57,7 +57,12 @@
 .ant-table-column-sorter-down.off {
   color: rgba(255, 255, 255, 0.4) !important;
 }
-
 .ant-drawer {
   z-index: 16777200 !important;
+}
+.ant-btn-dashed {
+  border-color: rgba(176, 31, 95, 1) !important;
+}
+.ant-btn-dashed:hover {
+  color: rgba(176, 31, 95, 1) !important;
 }
