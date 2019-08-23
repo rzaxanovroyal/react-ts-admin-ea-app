@@ -3,9 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="10c7cbd4-141d-4287-b86a-c88edca85590" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/App.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ea_app/src/components/attendee/attendee-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/components/attendee/attendee-component.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/index.css" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -42,6 +40,7 @@
   </component>
   <component name="ProjectId" id="1OVFNr8NpLlyi1J4RBAi0a1vFyT" />
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -126,7 +125,8 @@
       <workItem from="1566374719253" duration="13410000" />
       <workItem from="1566391775097" duration="2937000" />
       <workItem from="1566395718866" duration="700000" />
-      <workItem from="1566458427322" duration="27114000" />
+      <workItem from="1566458427322" duration="27260000" />
+      <workItem from="1566540407145" duration="10922000" />
     </task>
     <servers />
   </component>

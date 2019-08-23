@@ -60,8 +60,8 @@ class EditableCell extends PureComponent<EditableCellProps, EditableCellState> {
                         {getFieldDecorator(dataIndex, {
                             rules: [
                                 {
-                                    required: dataIndex === 'firstName',
-                                    message: `Please Input ${title}!`,
+                                    required: dataIndex === 'firstName' || dataIndex === 'email',
+                                    message: `Please enter ${title}`,
                                 },
                             ],
                             initialValue: record[dataIndex],
@@ -113,11 +113,22 @@ interface newAttendee {
     field_full_name: string;
 }
 
+interface Columns {
+    dataIndex?: string;
+    render?: (text: any, record: Attendee, index?: number | undefined) => any;
+    title: string;
+    key: string;
+    editable?: boolean;
+    sorter?: (a: any, b: any) => any;
+    sortDirections?: any;
+    defaultSortOrder?: "ascend" | "descend" | undefined;
+}
+
 type State = Readonly<{
     dataSource: Attendee[];
     editingRow: string;
-    count: number;
     isLoading: boolean;
+    createAttendeeMode: boolean;
 }>;
 
 declare module 'react' {
@@ -129,188 +140,8 @@ declare module 'react' {
 const spinIcon = <Icon type="loading" style={{fontSize: 6, marginLeft: 7, marginRight: 5, verticalAlign: 3}} spin/>;
 
 class AttendeeComponent extends PureComponent<Props, State> {
-    private columns: (
-        {
-            title: string;
-            render: (text: any, record: Attendee, index?: number | undefined) => any;
-            key: string;
-            editable?: boolean;
-            dataIndex?: string;
-        } |
-        {
-            dataIndex: string;
-            title: string;
-            key: string;
-            editable: boolean;
-            sorter: (a: any, b: any) => any;
-            sortDirections: any;
-            defaultSortOrder?: "ascend" | "descend" | undefined;
-        })[];
-
     constructor(props: Props) {
         super(props);
-        let tagPosition = 0;
-
-        this.columns = [
-            {
-                title: 'Edit',
-                key: 'edit',
-                render: (text, record) => {
-                    const {editingRow} = this.state;
-                    const editable = this.isEditing(record);
-
-                    if (record.key === 0) {
-                        return editable ?
-                            (<span>
-              <EditableContext.Consumer>
-                {(form: any) => (
-                    <a
-                        onClick={() => this.save(form, record.key)}
-                        style={{marginRight: 8}}
-                    > Save </a>)}
-              </EditableContext.Consumer>
-
-              <Popconfirm title="Sure to cancel?" onConfirm={() => this.cancel(record.key)}><a> Cancel </a></Popconfirm>
-            </span>)
-                            :
-                            (<a disabled={editingRow !== ''} onClick={() => this.edit(record.key)}>
-                                <Icon type="user-add" theme="outlined"
-                                      style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>
-                            </a>);
-                    }
-                    return editable ?
-                        (<span>
-              <EditableContext.Consumer>
-                {(form: any) => (
-                    <a
-                        onClick={() => this.save(form, record.key)}
-                        style={{marginRight: 8}}
-                    > Save </a>)}
-              </EditableContext.Consumer>
-
-              <Popconfirm title="Sure to cancel?" onConfirm={() => this.cancel(record.key)}><a> Cancel </a></Popconfirm>
-            </span>)
-                        :
-                        (<a disabled={editingRow !== ''} onClick={() => this.edit(record.key)}>
-                            <Icon type="edit" theme="outlined"
-                                  style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>
-                        </a>);
-                },
-            },
-            {
-                title: 'First name',
-                dataIndex: 'firstName',
-                key: 'firstName',
-                editable: true,
-                sorter: (a, b) => {
-                    a = a.firstName || 'z';
-                    b = b.firstName || 'z';
-                    return a.localeCompare(b);
-                },
-                sortDirections: ['ascend', 'descend']
-            },
-            {
-                title: 'Last name',
-                dataIndex: 'lastName',
-                key: 'lastName',
-                editable: true,
-                defaultSortOrder: 'ascend',
-                sorter: (a, b) => {
-                    a = a.lastName || 'z';
-                    b = b.lastName || 'z';
-                    return a.localeCompare(b);
-                },
-                sortDirections: ['ascend', 'descend']
-            },
-            {
-                title: 'Email',
-                dataIndex: 'email',
-                key: 'email',
-                editable: false,
-                sorter: (a, b) => {
-                    a = a.email || 'z';
-                    b = b.email || 'z';
-                    return a.localeCompare(b);
-                },
-                sortDirections: ['ascend', 'descend']
-            }, {
-                title: 'Attendee tags',
-                dataIndex: 'attendeeTags',
-                key: 'attendeeTags',
-                editable: false,
-                render: (tags, record, index) => (
-                    <span>
-        {tags.map((tag: eventTag) => {
-            let color;
-            switch (tagPosition) {
-                case 0:
-                    color = 'volcano';
-                    tagPosition = 1;
-                    break;
-                case 1:
-                    color = 'geekblue';
-                    tagPosition = 2;
-                    break;
-                case 2:
-                    color = 'green';
-                    tagPosition = 3;
-                    break;
-                case 3:
-                    color = 'orange';
-                    tagPosition = 4;
-                    break;
-                case 4:
-                    color = 'cyan';
-                    tagPosition = 5;
-                    break;
-                case 5:
-                    color = 'magenta';
-                    tagPosition = 6;
-                    break;
-                case 6:
-                    color = 'purple';
-                    tagPosition = 7;
-                    break;
-                case 7:
-                    color = 'red';
-                    tagPosition = 8;
-                    break;
-                case 8:
-                    color = 'blue';
-                    tagPosition = 9;
-                    break;
-                case 9:
-                    color = 'gold';
-                    tagPosition = 0;
-                    break;
-                default:
-                    color = 'lime';
-                    break
-            }
-            return (
-                this.state.isLoading ?
-                    <Tag key={tag.tagID} style={{background: '#fff', borderStyle: 'dashed'}}>{tag.tagName}<Spin
-                        indicator={spinIcon}/></Tag>
-                    :
-                    <Tag color={color} key={tag.tagID} closable
-                         onClose={(e: any) => {
-                             e.preventDefault();
-                             this.removeTag(record, tag.tagID)
-                         }}> {tag.tagName} </Tag>
-            );
-        })}
-
-                        <Tag key={index} onClick={(e: any) => {
-                            e.preventDefault();
-                            this.addTag(record)
-                        }} style={{background: '#fff', borderStyle: 'dashed'}}>
-                                <Icon type="plus"/> Add Tag
-                            </Tag>
-                    </span>
-                ),
-            }
-        ];
-
         this.state = {
             dataSource: [{
                 key: 0,
@@ -323,8 +154,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 }],
             }],
             editingRow: '',
-            count: 2,
-            isLoading: true
+            isLoading: true,
+            createAttendeeMode: false
         };
     }
 
@@ -453,6 +284,41 @@ class AttendeeComponent extends PureComponent<Props, State> {
         });
     }
 
+    private createNewAttendee = (form: any, key: any): void => {
+        this.setState({
+            isLoading: true,
+        });
+
+        form.validateFields((error: any, row: any) => {
+            if (error) {
+                return;
+            }
+            this.fetchAllUsers();
+            /*const newData = [...this.state.dataSource];
+            const index = newData.findIndex(item => key === item.key);
+            const attendeeID = this.props.data.attendees.data[key].id;
+
+            if (index > -1) {
+                const item = newData[index];
+                newData.splice(index, 1, {
+                    ...item,
+                    ...row,
+                });
+                this.setState({dataSource: newData, editingRow: ''});
+
+                const updatedAttendee = newData[key];
+                const newAttendee: newAttendee = {
+                    field_first_name: updatedAttendee.firstName,
+                    field_last_name: updatedAttendee.lastName,
+                    field_full_name: updatedAttendee.lastName ? `${updatedAttendee.firstName} ${updatedAttendee.lastName}` : updatedAttendee.firstName
+                };
+            } else {
+                newData.push(row);
+                this.setState({dataSource: newData, editingRow: ''});
+            }*/
+        });
+    };
+
     edit(key: any) {
         this.setState({editingRow: key});
     }
@@ -475,6 +341,26 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 const attendees = res.data;
                 this.props.setAttendees(attendees);
                 this.setState({isLoading: false});
+            })
+            .catch((error: any) => console.log(error));
+    };
+
+    private fetchAllUsers = (): void => {
+        const fetchURL = `${prodURL}/jsonapi/user/user?fields=name`;
+        axios({
+            method: 'get',
+            url: `${fetchURL}`,
+            auth: {
+                username: `${fetchUsername}`,
+                password: `${fetchPassword}`
+            },
+            headers: {
+                'Accept': 'application/vnd.api+json',
+                'Content-Type': 'application/vnd.api+json',
+            }
+        })
+            .then((res) => {
+                console.log(res);
             })
             .catch((error: any) => console.log(error));
     };
@@ -540,15 +426,13 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 attendeeTags: tags
             }
         });
-        const dataSource = attendeeData;
-
         this.setState({
-            dataSource: dataSource
+            dataSource: attendeeData
         })
     };
 
     private handleAdd = (): void => {
-        const {count, dataSource} = this.state;
+        const {dataSource} = this.state;
         const newData = {
             key: -1,
             firstName: '#Enter First name',
@@ -558,7 +442,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
         };
         this.setState({
             dataSource: [...dataSource, newData],
-            count: count + 1,
+            createAttendeeMode: true
         });
     };
 
@@ -582,13 +466,183 @@ class AttendeeComponent extends PureComponent<Props, State> {
     }
 
     render() {
+        let tagPosition = 0;
+
+        const columnsBlueprint: Columns[] = [
+            {
+                title: 'Edit',
+                key: 'edit',
+                render: (text, record) => {
+                    const {editingRow} = this.state;
+                    const editable = this.isEditing(record);
+
+                    if (record.key === -1) {
+                        return editable ?
+                            (<span>
+              <EditableContext.Consumer>
+                {(form: any) => (
+                    <a
+                        onClick={() => this.createNewAttendee(form, record.key)}
+                        style={{marginRight: 8}}
+                    > Save </a>)}
+              </EditableContext.Consumer>
+
+              <Popconfirm title="Sure to cancel?" onConfirm={() => this.cancel(record.key)}><a> Cancel </a></Popconfirm>
+            </span>)
+                            :
+                            (<a disabled={editingRow !== ''} onClick={() => this.edit(record.key)}>
+                                <Icon type="user-add" theme="outlined"
+                                      style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>
+                            </a>);
+                    }
+                    return editable ?
+                        (<span>
+              <EditableContext.Consumer>
+                {(form: any) => (
+                    <a
+                        onClick={() => this.save(form, record.key)}
+                        style={{marginRight: 8}}
+                    > Save </a>)}
+              </EditableContext.Consumer>
+
+              <Popconfirm title="Sure to cancel?" onConfirm={() => this.cancel(record.key)}><a> Cancel </a></Popconfirm>
+            </span>)
+                        :
+                        (<a disabled={editingRow !== ''} onClick={() => this.edit(record.key)}>
+                            <Icon type="edit" theme="outlined"
+                                  style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>
+                        </a>);
+                },
+            },
+            {
+                title: 'First name',
+                dataIndex: 'firstName',
+                key: 'firstName',
+                editable: true,
+                sorter: (a, b) => {
+                    a = a.firstName || 'z';
+                    b = b.firstName || 'z';
+                    return a.localeCompare(b);
+                },
+                sortDirections: ['ascend', 'descend']
+            },
+            {
+                title: 'Last name',
+                dataIndex: 'lastName',
+                key: 'lastName',
+                editable: true,
+                defaultSortOrder: 'ascend',
+                sorter: (a, b) => {
+                    a = a.lastName || 'z';
+                    b = b.lastName || 'z';
+                    return a.localeCompare(b);
+                },
+                sortDirections: ['ascend', 'descend']
+            },
+            {
+                title: 'Email',
+                dataIndex: 'email',
+                key: 'email',
+                editable: this.state.createAttendeeMode,
+                sorter: (a, b) => {
+                    a = a.email || 'z';
+                    b = b.email || 'z';
+                    return a.localeCompare(b);
+                },
+                sortDirections: ['ascend', 'descend']
+            }, {
+                title: 'Attendee tags',
+                dataIndex: 'attendeeTags',
+                key: 'attendeeTags',
+                editable: false,
+                render: (tags, record, index) => {
+                    if (record.key === -1) {
+                        return (
+                            <div>Please create new attendee before adding tags</div>
+                        )
+                    }
+                    return (
+                        <span>
+                        {tags.map((tag: eventTag) => {
+                            let color;
+                            switch (tagPosition) {
+                                case 0:
+                                    color = 'volcano';
+                                    tagPosition = 1;
+                                    break;
+                                case 1:
+                                    color = 'geekblue';
+                                    tagPosition = 2;
+                                    break;
+                                case 2:
+                                    color = 'green';
+                                    tagPosition = 3;
+                                    break;
+                                case 3:
+                                    color = 'orange';
+                                    tagPosition = 4;
+                                    break;
+                                case 4:
+                                    color = 'cyan';
+                                    tagPosition = 5;
+                                    break;
+                                case 5:
+                                    color = 'magenta';
+                                    tagPosition = 6;
+                                    break;
+                                case 6:
+                                    color = 'purple';
+                                    tagPosition = 7;
+                                    break;
+                                case 7:
+                                    color = 'red';
+                                    tagPosition = 8;
+                                    break;
+                                case 8:
+                                    color = 'blue';
+                                    tagPosition = 9;
+                                    break;
+                                case 9:
+                                    color = 'gold';
+                                    tagPosition = 0;
+                                    break;
+                                default:
+                                    color = 'lime';
+                                    break
+                            }
+                            return (
+                                this.state.isLoading ?
+                                    <Tag key={tag.tagID}
+                                         style={{background: '#fff', borderStyle: 'dashed'}}>{tag.tagName}<Spin
+                                        indicator={spinIcon}/></Tag>
+                                    :
+
+                                    <Tag color={color} key={tag.tagID} closable
+                                         onClose={(e: any) => {
+                                             e.preventDefault();
+                                             this.removeTag(record, tag.tagID)
+                                         }}> {tag.tagName} </Tag>
+                            )
+                        })}
+                            < Tag key={index} onClick={(e: any) => {
+                                e.preventDefault();
+                                this.addTag(record)
+                            }} style={{background: '#fff', borderStyle: 'dashed'}}>
+                            <Icon type="plus"/> Add Tag
+                            </Tag>
+                       </span>
+                    )
+                }
+            }
+        ];
+
         const components = {
             body: {
                 row: EditableFormRow,
                 cell: EditableCell,
             },
         };
-        const columns = this.columns.map(col => {
+        const columns = columnsBlueprint.map(col => {
             if (!col.editable) {
                 return col;
             }
@@ -606,10 +660,11 @@ class AttendeeComponent extends PureComponent<Props, State> {
 
         return (
             <React.Fragment>
+                {!this.state.createAttendeeMode ?
                 <Button onClick={this.handleAdd} type="dashed" style={{marginBottom: 16}}>
                     <Icon type="plus" theme="outlined"
                           style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>Add row
-                </Button>
+                </Button> : null}
                 <EditableContext.Provider value={this.props.form}>
                     <Table<Attendee>
                         components={components}
