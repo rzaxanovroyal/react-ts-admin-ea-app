@@ -62,6 +62,7 @@ class EditableCell extends PureComponent<EditableCellProps, EditableCellState> {
                                 {
                                     required: dataIndex === 'firstName' || dataIndex === 'email',
                                     message: `Please enter ${title}`,
+                                    type: dataIndex === 'email' ? 'email' : 'string'
                                 },
                             ],
                             initialValue: record[dataIndex],
@@ -129,6 +130,7 @@ type State = Readonly<{
     editingRow: string;
     isLoading: boolean;
     createAttendeeMode: boolean;
+    attendeeAlreadyRegistered: boolean | null;
 }>;
 
 declare module 'react' {
@@ -155,7 +157,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
             }],
             editingRow: '',
             isLoading: true,
-            createAttendeeMode: false
+            createAttendeeMode: false,
+            attendeeAlreadyRegistered: null
         };
     }
 
@@ -290,32 +293,9 @@ class AttendeeComponent extends PureComponent<Props, State> {
         });
 
         form.validateFields((error: any, row: any) => {
-            if (error) {
-                return;
-            }
-            this.fetchAllUsers();
-            /*const newData = [...this.state.dataSource];
-            const index = newData.findIndex(item => key === item.key);
-            const attendeeID = this.props.data.attendees.data[key].id;
+            if (error) {return;}
 
-            if (index > -1) {
-                const item = newData[index];
-                newData.splice(index, 1, {
-                    ...item,
-                    ...row,
-                });
-                this.setState({dataSource: newData, editingRow: ''});
-
-                const updatedAttendee = newData[key];
-                const newAttendee: newAttendee = {
-                    field_first_name: updatedAttendee.firstName,
-                    field_last_name: updatedAttendee.lastName,
-                    field_full_name: updatedAttendee.lastName ? `${updatedAttendee.firstName} ${updatedAttendee.lastName}` : updatedAttendee.firstName
-                };
-            } else {
-                newData.push(row);
-                this.setState({dataSource: newData, editingRow: ''});
-            }*/
+            this.fetchAllUsers(row.email);
         });
     };
 
@@ -345,8 +325,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
             .catch((error: any) => console.log(error));
     };
 
-    private fetchAllUsers = (): void => {
-        const fetchURL = `${prodURL}/jsonapi/user/user?fields=name`;
+    private fetchAllUsers = (enteredEmail: string): void => {
+        const fetchURL = `${prodURL}/jsonapi/user/user?fields[user--user]=mail&filter[mail]=${enteredEmail}`;
         axios({
             method: 'get',
             url: `${fetchURL}`,
@@ -360,7 +340,11 @@ class AttendeeComponent extends PureComponent<Props, State> {
             }
         })
             .then((res) => {
-                console.log(res);
+                const registeredAttendees = res.data.data;
+                const attendeeAlreadyRegistered = registeredAttendees.some((attendee:string) => attendee);
+                    this.setState({
+                        attendeeAlreadyRegistered: attendeeAlreadyRegistered
+                    })
             })
             .catch((error: any) => console.log(error));
     };
