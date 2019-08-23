@@ -130,7 +130,6 @@ type State = Readonly<{
     editingRow: string;
     isLoading: boolean;
     createAttendeeMode: boolean;
-    attendeeAlreadyRegistered: boolean | null;
 }>;
 
 declare module 'react' {
@@ -157,8 +156,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
             }],
             editingRow: '',
             isLoading: true,
-            createAttendeeMode: false,
-            attendeeAlreadyRegistered: null
+            createAttendeeMode: false
         };
     }
 
@@ -199,9 +197,11 @@ class AttendeeComponent extends PureComponent<Props, State> {
             })
             .catch(error => console.log(error));
     };
+
     private addTag = (record: Attendee) => {
         this.props.toggleDrawer(true, record);
     };
+
     private updateAttendees = (attendeeID: string, newAttendee: newAttendee): void => {
         axios({
             method: 'patch',
@@ -293,15 +293,124 @@ class AttendeeComponent extends PureComponent<Props, State> {
         });
 
         form.validateFields((error: any, row: any) => {
-            if (error) {return;}
-
-            this.fetchAllUsers(row.email);
+            if (error) {
+                return;
+            }
+            //this.registerUser(row.email, row.firstName, row.lastName);
+            axios({
+                method: 'post',
+                url: `${prodURL}/jsonapi/node/attendee`,
+                auth: {
+                    username: `${fetchUsername}`,
+                    password: `${fetchPassword}`
+                },
+                headers: {
+                    'Accept': 'application/vnd.api+json',
+                    'Content-Type': 'application/vnd.api+json'
+                },
+                data: {
+                    "data": {
+                        "type": "node--attendee",
+                        "attributes": {
+                            "title": row.email,
+                            "field_first_name": row.firstName,
+                            "field_full_name": row.lastName ? `${row.firstName} ${row.lastName}` : row.firstName,
+                            "field_last_name": row.lastName,
+                        }
+                    }
+                }
+            })
+                .catch(function (error) {
+                    if (error.response) {
+                        // The request was made and the server responded with a status code
+                        // that falls out of the range of 2xx
+                        console.log(error.response.data);
+                        console.log(error.response.status);
+                        console.log(error.response.headers);
+                    } else if (error.request) {
+                        // The request was made but no response was received
+                        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                        // http.ClientRequest in node.js
+                        console.log(error.request);
+                    } else {
+                        // Something happened in setting up the request that triggered an Error
+                        console.log('Error', error.message);
+                    }
+                    console.log(error.config);
+                });
         });
     };
 
     edit(key: any) {
         this.setState({editingRow: key});
     }
+
+    private registerUser = (enteredEmail: string, firstName: string, lastName: string): void => {
+        const fetchURL = `${prodURL}/jsonapi/user/user?fields[user--user]=mail&filter[mail]=${enteredEmail}`;
+        axios({
+            method: 'get',
+            url: `${fetchURL}`,
+            auth: {
+                username: `${fetchUsername}`,
+                password: `${fetchPassword}`
+            },
+            headers: {
+                'Accept': 'application/vnd.api+json',
+                'Content-Type': 'application/vnd.api+json',
+            }
+        })
+            .then((res) => {
+                const registeredAttendees = res.data.data;
+                const attendeeAlreadyRegistered = registeredAttendees.some((attendee: string) => attendee);
+
+                if (attendeeAlreadyRegistered === false) {
+                    axios({
+                        method: 'post',
+                        url: `${prodURL}/user/register?_format=json`,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-Token': this.props.data.XCSRFtoken
+                        },
+                        data: {
+                            "name": {"value": enteredEmail},
+                            "mail": {"value": enteredEmail}
+                        }
+                    })
+                        .catch((error: any) => console.log(error));
+                }
+            })
+            .then(res => {
+                axios({
+                    method: 'post',
+                    url: `${prodURL}/jsonapi/node/attendee`,
+                    auth: {
+                        username: `${fetchUsername}`,
+                        password: `${fetchPassword}`
+                    },
+                    headers: {
+                        'Accept': 'application/vnd.api+json',
+                        'Content-Type': 'application/vnd.api+json',
+                        'X-CSRF-Token': this.props.data.XCSRFtoken
+                    },
+                    data: {
+                        "data": {
+                            "type": "node--attendee",
+                            "attributes": {
+                                "title": enteredEmail,
+                                "field_first_name": firstName,
+                                "field_full_name": lastName ? `${firstName} ${lastName}` : firstName,
+                                "field_last_name": lastName,
+                            }
+                        }
+                    }
+                })
+                    .catch((error: any) => console.log(error));
+            })
+            .then(res => {
+                this.fetchAttendees()
+            })
+            .catch((error: any) => console.log(error));
+    };
 
     private fetchAttendees = (): void => {
         const fetchURL = `${prodURL}/jsonapi/node/attendee/?filter[field_event_reference.field_event_access_code][value]=${this.props.data.eventCode}&fields[user--user]=name,mail&include=field_attendee_tags.vid&fields[node--attendee]=title,field_first_name,field_last_name,field_attendee_tags&fields[taxonomy_term--attendee_tags]=name`;
@@ -320,31 +429,10 @@ class AttendeeComponent extends PureComponent<Props, State> {
             .then((res) => {
                 const attendees = res.data;
                 this.props.setAttendees(attendees);
-                this.setState({isLoading: false});
-            })
-            .catch((error: any) => console.log(error));
-    };
-
-    private fetchAllUsers = (enteredEmail: string): void => {
-        const fetchURL = `${prodURL}/jsonapi/user/user?fields[user--user]=mail&filter[mail]=${enteredEmail}`;
-        axios({
-            method: 'get',
-            url: `${fetchURL}`,
-            auth: {
-                username: `${fetchUsername}`,
-                password: `${fetchPassword}`
-            },
-            headers: {
-                'Accept': 'application/vnd.api+json',
-                'Content-Type': 'application/vnd.api+json',
-            }
-        })
-            .then((res) => {
-                const registeredAttendees = res.data.data;
-                const attendeeAlreadyRegistered = registeredAttendees.some((attendee:string) => attendee);
-                    this.setState({
-                        attendeeAlreadyRegistered: attendeeAlreadyRegistered
-                    })
+                this.setState({
+                    isLoading: false,
+                    createAttendeeMode: false
+                });
             })
             .catch((error: any) => console.log(error));
     };
@@ -430,13 +518,22 @@ class AttendeeComponent extends PureComponent<Props, State> {
         });
     };
 
-    componentDidMount(): void {
+    componentDidMount()
+        :
+        void {
         this.fetchAttendees();
         this.fetchEventTags();
     }
 
-    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-        if (this.props.data.attendees !== prevProps.data.attendees) {
+    componentDidUpdate(prevProps
+                           :
+                           Readonly<Props>, prevState
+                           :
+                           Readonly<State>, snapshot ?: any
+    ):
+        void {
+        if (this.props.data.attendees !== prevProps.data.attendees
+        ) {
             this.setDataSource();
         }
         if (this.props.view.callMethod !== prevProps.view.callMethod) {
@@ -645,10 +742,10 @@ class AttendeeComponent extends PureComponent<Props, State> {
         return (
             <React.Fragment>
                 {!this.state.createAttendeeMode ?
-                <Button onClick={this.handleAdd} type="dashed" style={{marginBottom: 16}}>
-                    <Icon type="plus" theme="outlined"
-                          style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>Add row
-                </Button> : null}
+                    <Button onClick={this.handleAdd} type="dashed" style={{marginBottom: 16}}>
+                        <Icon type="plus" theme="outlined"
+                              style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>Add row
+                    </Button> : null}
                 <EditableContext.Provider value={this.props.form}>
                     <Table<Attendee>
                         components={components}
