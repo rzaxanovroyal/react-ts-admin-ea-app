@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="10c7cbd4-141d-4287-b86a-c88edca85590" name="Default Changelist" comment="">
+    <list default="true" id="3277053e-f289-41bc-85da-c6819d4f9bb8" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/$CACHE_FILE$" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/maxim.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/event-admin.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/event-admin.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/components/attendee/attendee-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/components/attendee/attendee-component.tsx" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -11,60 +18,20 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ComposerSettings">
-    <execution>
-      <executable />
-    </execution>
-  </component>
-  <component name="DrupalConfiguration" enabled="true" version="8">
-    <drupalPath />
-  </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="JavaScript File" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="JsFlowSettings">
-    <service-enabled>true</service-enabled>
-    <exe-path />
-    <other-services-enabled>true</other-services-enabled>
-    <auto-save>true</auto-save>
-  </component>
-  <component name="MacroExpansionManager">
-    <option name="directoryName" value="NRNmTyVP" />
-  </component>
-  <component name="ProjectId" id="1OVFNr8NpLlyi1J4RBAi0a1vFyT" />
+  <component name="ProjectId" id="1Ps0Um6ATo1BtkLKcnWp35ZXmDI" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
-    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
-    <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="ignore_missing_gitignore" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/ea-app/src/store/view" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
-    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Color Scheme Font" />
     <property name="ts.external.directory.path" value="C:\server\EventStory\event-admin\ea_app\node_modules\typescript\lib" />
-  </component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\server\EventStory\event-admin\ea-app\src\store\view" />
-      <recent name="C:\server\EventStory\event-admin\ea-app\src" />
-      <recent name="C:\server\EventStory\event-admin\ea-app\src\store\fetched-responses" />
-      <recent name="C:\server\EventStory\event-admin\ea-app\src\store\data" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\server\EventStory\event-admin\ea-app\src\components\attendee" />
-      <recent name="C:\server\EventStory\event-admin\ea-app\src\shared" />
-    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -83,51 +50,14 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="10c7cbd4-141d-4287-b86a-c88edca85590" name="Default Changelist" comment="" />
-      <created>1564054820108</created>
+      <changelist id="3277053e-f289-41bc-85da-c6819d4f9bb8" name="Default Changelist" comment="" />
+      <created>1566647515348</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1564054820108</updated>
-      <workItem from="1564054823794" duration="3268000" />
-      <workItem from="1564058262792" duration="10514000" />
-      <workItem from="1564123388910" duration="18772000" />
-      <workItem from="1564156247048" duration="3300000" />
-      <workItem from="1564325617189" duration="28000" />
-      <workItem from="1564325699736" duration="3922000" />
-      <workItem from="1564387201261" duration="22555000" />
-      <workItem from="1564427839979" duration="94000" />
-      <workItem from="1564430040377" duration="156000" />
-      <workItem from="1564477674217" duration="19488000" />
-      <workItem from="1564560779046" duration="98000" />
-      <workItem from="1564560916259" duration="12752000" />
-      <workItem from="1564738418522" duration="48000" />
-      <workItem from="1564738527063" duration="1144000" />
-      <workItem from="1564823077488" duration="11772000" />
-      <workItem from="1564904892791" duration="138000" />
-      <workItem from="1564905686869" duration="170000" />
-      <workItem from="1564908442263" duration="5827000" />
-      <workItem from="1564991010748" duration="15266000" />
-      <workItem from="1565074384886" duration="8286000" />
-      <workItem from="1565102703817" duration="426000" />
-      <workItem from="1565162808583" duration="5901000" />
-      <workItem from="1565252043578" duration="12139000" />
-      <workItem from="1565285047606" duration="605000" />
-      <workItem from="1565345549992" duration="2054000" />
-      <workItem from="1565352632223" duration="9422000" />
-      <workItem from="1565616512861" duration="77000" />
-      <workItem from="1565616628956" duration="619000" />
-      <workItem from="1565699526611" duration="2580000" />
-      <workItem from="1565766546246" duration="14161000" />
-      <workItem from="1565787903938" duration="10152000" />
-      <workItem from="1565851837311" duration="20618000" />
-      <workItem from="1565940810352" duration="27270000" />
-      <workItem from="1566286665861" duration="24245000" />
-      <workItem from="1566374719253" duration="13410000" />
-      <workItem from="1566391775097" duration="2937000" />
-      <workItem from="1566395718866" duration="700000" />
-      <workItem from="1566458427322" duration="27260000" />
-      <workItem from="1566540407145" duration="14349000" />
-      <workItem from="1566568325346" duration="10133000" />
+      <updated>1566647515348</updated>
+      <workItem from="1566647519147" duration="403000" />
+      <workItem from="1566647938469" duration="395000" />
+      <workItem from="1566648949823" duration="198000" />
     </task>
     <servers />
   </component>
