@@ -5,9 +5,9 @@ import {fetchPassword, fetchUsername, prodURL} from "../../shared/keys";
 import axios from "axios";
 import styled from "styled-components";
 import {DataState} from "../../store/data/reducer";
-import {Tag, Drawer, Button} from 'antd';
+import {Button, Drawer, Tag} from 'antd';
 import {ViewState} from "../../store/view/reducer";
-import {toggleDrawer, callMethod} from "../../store/view/actions";
+import {callMethod, toggleDrawer} from "../../store/view/actions";
 import {eventTag} from "./attendee-component";
 import _ from 'lodash';
 

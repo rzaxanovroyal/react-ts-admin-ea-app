@@ -1,14 +1,14 @@
-import React, {PureComponent, AriaAttributes, DOMAttributes} from 'react';
+import React, {AriaAttributes, DOMAttributes, PureComponent} from 'react';
 import {connect} from 'react-redux';
 import {RootState} from "../../store/store";
 import {fetchPassword, fetchUsername, prodURL} from "../../shared/keys";
 import axios from "axios";
 
-import {DataState, AttendeeData, EventTags} from "../../store/data/reducer";
+import {AttendeeData, DataState, EventTags} from "../../store/data/reducer";
 import {setAttendees, setEventTags} from "../../store/data/actions";
-import {toggleDrawer, callMethod} from "../../store/view/actions";
+import {callMethod, toggleDrawer} from "../../store/view/actions";
 
-import {Table, Input, Popconfirm, Form, InputNumber, Icon, Tag, Spin, Button} from 'antd';
+import {Button, Form, Icon, Input, InputNumber, Popconfirm, Spin, Table, Tag} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
 import DrawerTagsComponent from "./drawer-tags-component"
 import {ViewState} from "../../store/view/reducer";

@@ -1,68 +1,76 @@
 .editable-cell {
-  position: relative;
+    position: relative;
 }
 
 .editable-cell-value-wrap {
-  padding: 5px 12px;
-  cursor: pointer;
+    padding: 5px 12px;
+    cursor: pointer;
 }
 
 .editable-row:hover .editable-cell-value-wrap {
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
-  padding: 4px 11px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    padding: 4px 11px;
 }
+
 .editable-row .ant-form-explain {
-  position: absolute;
-  font-size: 12px;
-  margin-top: -4px;
+    position: absolute;
+    font-size: 12px;
+    margin-top: -4px;
 }
+
 .ant-table-thead tr th {
-  background-color: rgba(176, 31, 95, 1) !important;
-  color: rgba(240, 240, 240, 1) !important;
-  font-weight: bold !important;
+    background-color: rgba(50, 197, 210, 1) !important;
+    color: rgba(240, 240, 240, 1) !important;
+    text-shadow: 1px 1px rgba(30, 30, 30, 0.4);
+    font-weight: bold !important;
 }
 
 .ant-pagination-item-active,
 .ant-pagination-item-active a,
 .ant-pagination-item a:hover,
 .ant-pagination-item:hover {
-  border-color: rgba(176, 31, 95, 1) !important;
-  color: rgba(176, 31, 95, 1) !important;
+    border-color: rgba(176, 31, 95, 1) !important;
+    color: rgba(176, 31, 95, 1) !important;
 }
 
 .ant-btn-primary,
 .ant-tag-checkable-checked {
-  background-color: rgba(176, 31, 95, 1) !important;
-  border-style: none !important;
-  box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.6) !important;
+    background-color: rgba(176, 31, 95, 1) !important;
+    border-style: none !important;
+    box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.6) !important;
 }
 
 .ant-btn-primary:hover {
-  box-shadow: 1px 1px 8px rgba(20, 20, 20, 1) !important;
+    box-shadow: 1px 1px 8px rgba(20, 20, 20, 1) !important;
 }
 
 .ant-tag {
-  margin: 4px 8px 4px 0 !important;
+    margin: 4px 8px 4px 0 !important;
 }
 
 .ant-tag-checkable:not(.ant-tag-checkable-checked):hover {
-  color: rgba(176, 31, 95, 1) !important;
+    color: rgba(176, 31, 95, 1) !important;
 }
+
 .ant-table-column-sorter-up.on,
 .ant-table-column-sorter-down.on {
-  color: rgba(255, 255, 255, 1) !important;
+    color: rgba(255, 255, 255, 1) !important;
 }
+
 .ant-table-column-sorter-up.off,
 .ant-table-column-sorter-down.off {
-  color: rgba(255, 255, 255, 0.4) !important;
+    color: rgba(255, 255, 255, 0.4) !important;
 }
+
 .ant-drawer {
-  z-index: 16777200 !important;
+    z-index: 16777200 !important;
 }
+
 .ant-btn-dashed {
-  border-color: rgba(176, 31, 95, 1) !important;
+    border-color: rgba(176, 31, 95, 1) !important;
 }
+
 .ant-btn-dashed:hover {
-  color: rgba(176, 31, 95, 1) !important;
+    color: rgba(176, 31, 95, 1) !important;
 }

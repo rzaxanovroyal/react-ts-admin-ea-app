@@ -2,11 +2,11 @@ import React, {PureComponent} from 'react';
 import {connect} from 'react-redux';
 
 import {RootState} from "./store/store";
-import AttendeeComponent from "./components/attendee/attendee-component";
 import {setEventCode, setXCSRFtoken} from "./store/data/actions";
 import {DataState} from "./store/data/reducer";
 import axios from "axios";
 import {prodURL} from "./shared/keys";
+import SidebarComponent from "./components/sidebar-component";
 
 interface OwnProps {
     setXCSRFtoken(XCSRFtoken: string): void;
@@ -68,7 +68,7 @@ class App extends PureComponent<Props, State> {
             this.state.isLoading ?
                 <h1>Loading...</h1>
                 :
-                <AttendeeComponent/>
+                <SidebarComponent/>
         );
     }
 }

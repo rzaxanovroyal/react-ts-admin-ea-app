@@ -2,15 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3277053e-f289-41bc-85da-c6819d4f9bb8" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/$CACHE_FILE$" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/maxim.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/event-admin.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/event-admin.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/saveactions_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ea_app/src/components/attendee-tags/attendee-tags-component.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ea_app/src/components/moment-tags/moment-tags-component.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ea_app/src/components/sidebar-component.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea_app/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea_app/src/components/attendee/attendee-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/components/attendee/attendee-component.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea_app/src/components/attendee/drawer-tags-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/components/attendee/drawer-tags-component.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea_app/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea_app/src/shared/theme.js" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/shared/theme.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/event_admin.module" beforeDir="false" afterPath="$PROJECT_DIR$/event_admin.module" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -18,20 +20,39 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript JSX File" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="JsFlowSettings">
+    <service-enabled>true</service-enabled>
+    <exe-path />
+    <other-services-enabled>true</other-services-enabled>
+    <auto-save>true</auto-save>
   </component>
   <component name="ProjectId" id="1Ps0Um6ATo1BtkLKcnWp35ZXmDI" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="ignore_missing_gitignore" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../albums_admin" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Color Scheme Font" />
+    <property name="settings.editor.selected.configurable" value="editing.templates" />
     <property name="ts.external.directory.path" value="C:\server\EventStory\event-admin\ea_app\node_modules\typescript\lib" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\server\EventStory\event-admin\ea_app\src\components" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -58,6 +79,13 @@
       <workItem from="1566647519147" duration="403000" />
       <workItem from="1566647938469" duration="395000" />
       <workItem from="1566648949823" duration="198000" />
+      <workItem from="1566649167356" duration="615000" />
+      <workItem from="1566650973760" duration="888000" />
+      <workItem from="1566655319226" duration="1305000" />
+      <workItem from="1566656648548" duration="2637000" />
+      <workItem from="1566663536280" duration="54000" />
+      <workItem from="1566666023957" duration="94000" />
+      <workItem from="1566725429166" duration="13442000" />
     </task>
     <servers />
   </component>
