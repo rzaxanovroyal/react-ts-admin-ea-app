@@ -3,12 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="3277053e-f289-41bc-85da-c6819d4f9bb8" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/components/attendee-tags/attendee-tags-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/components/attendee-tags/attendee-tags-component.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/components/attendee/drawer-tags-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/components/attendee/drawer-tags-component.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ea_app/src/components/sidebar-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/components/sidebar-component.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/yarn.lock" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -84,7 +79,8 @@
       <workItem from="1566666023957" duration="94000" />
       <workItem from="1566725429166" duration="15371000" />
       <workItem from="1566743942607" duration="142000" />
-      <workItem from="1566799324183" duration="22098000" />
+      <workItem from="1566799324183" duration="22284000" />
+      <workItem from="1566835596215" duration="6472000" />
     </task>
     <servers />
   </component>

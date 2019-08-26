@@ -7,14 +7,19 @@ import MomentTagsComponent from './moment-tags/moment-tags-component';
 
 //CSS starts
 const Wrapper = styled.div`
-  display: flex;
-  justify-content: center;
+  display: grid;
   margin: 15px;
+     @media(min-width: 800px) {
+      grid-template-columns: 1fr 4fr;
+   }
+    @media(min-width: 1400px) {
+      grid-template-columns: 1fr 2fr 8fr 1fr;
+   }
 `;
 const SidebarWrapper = styled.div`
-  min-width: 180px;
-  display: flex;
-  flex-direction: column;
+    @media(min-width: 1400px) {
+      grid-column-start: 2;
+  }
   margin: 50px 15px 0 0;
 `;
 const SidebarItem = styled.div`
@@ -26,6 +31,7 @@ const SidebarItem = styled.div`
    border-right: ${props => props.isActive ? `3px solid ${props.theme.colorSecondary}` : `3px solid white`};
 `;
 const ComponentWrapper = styled.div`
+  flex-shrink: 1;
 `;
 
 //CSS Ends
@@ -85,7 +91,6 @@ class SidebarComponent extends PureComponent<Props, State> {
                     <SidebarItem onClick={this.setComponent('Moment tags')}
                                  isActive={component === 'Moment tags'}>MOMENT TAGS</SidebarItem>
                 </SidebarWrapper>
-
                 <ComponentWrapper>
                     {currentComponent}
                 </ComponentWrapper>
