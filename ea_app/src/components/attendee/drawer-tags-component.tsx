@@ -1,15 +1,16 @@
 import React, {PureComponent} from 'react';
 import {connect} from 'react-redux';
-import {RootState} from "../../store/store";
 import {fetchPassword, fetchUsername, prodURL} from "../../shared/keys";
 import axios from "axios";
 import styled from "styled-components";
-import {DataState} from "../../store/data/reducer";
 import {Button, Drawer, Tag} from 'antd';
+import _ from 'lodash';
+
+import {RootState} from "../../store/store";
+import {DataState} from "../../store/data/reducer";
 import {ViewState} from "../../store/view/reducer";
 import {callMethod, toggleDrawer} from "../../store/view/actions";
 import {EventTag} from "./attendee-component";
-import _ from 'lodash';
 import {catchError} from "../../shared/common-methods";
 
 // CSS starts
@@ -191,7 +192,6 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
                         <Button loading={this.state.isLoading} onClick={this.saveTags} type="primary">Submit</Button>
                         : null}
                 </DrawerButtonContainer>
-
             </Drawer>
         );
     }

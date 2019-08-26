@@ -1,9 +1,52 @@
 import React, {PureComponent} from 'react';
 import {connect} from 'react-redux';
 import {RootState} from "../../store/store";
-import {Icon, Spin, Table, Tag} from "antd";
+import {Form, Icon, Input, Modal, Spin, Table, Tag} from "antd";
 import {ColumnProps} from 'antd/es/table';
+import {FormComponentProps} from 'antd/es/form';
 import {EventTag} from "../attendee/attendee-component";
+import {DataState} from "../../store/data/reducer";
+import styled from "styled-components";
+
+// CSS starts
+const Wrapper = styled.div`
+ margin-top: 50px;
+`;
+
+// CSS ends
+
+interface EventTagFormProps extends FormComponentProps {
+    visible: boolean;
+    onCancel: () => void;
+    onCreate: () => void;
+}
+
+const FormInModal = Form.create<EventTagFormProps>({name: 'form_in_modal'})(
+    // eslint-disable-next-line
+    class extends React.Component<EventTagFormProps, any> {
+        render() {
+            //@ts-ignore
+            const {visible, onCancel, onCreate, form} = this.props;
+            const {getFieldDecorator} = form;
+            return (
+                <Modal
+                    visible={visible}
+                    onCancel={onCancel}
+                    onOk={onCreate}
+                >
+                    <Form layout="vertical">
+                        <Form.Item label="Attendee Tag">
+                            {getFieldDecorator('tag', {
+                                rules: [{required: true, message: 'Please enter the tag'}],
+                            })(<Input/>)}
+                        </Form.Item>
+                    </Form>
+                </Modal>
+            );
+        }
+    },
+);
+
 
 const spinIcon = <Icon type="loading" style={{fontSize: 6, marginLeft: 7, marginRight: 5, verticalAlign: 3}} spin/>;
 
@@ -15,10 +58,13 @@ interface TableRow {
     eventTags: EventTag[];
 }
 
-type Props = OwnProps & ReturnType<typeof mapStateToProps> & typeof mapDispatchToProps;
+const mapStateToProps = ({data}: RootState): { data: DataState } => ({data});
+
+type Props = OwnProps & ReturnType<typeof mapStateToProps>
 
 type State = Readonly<{
     isLoading: boolean;
+    visible: boolean;
     dataSource: TableRow[];
 }>;
 
@@ -31,17 +77,63 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
                 tagName: ''
             }],
         }],
-        isLoading: false
+        isLoading: false,
+        visible: false
     };
+
+    private setEventTags = (): void => {
+        const eventData = this.props.data.eventTags;
+
+        const eventTags = eventData.map((tag: any) => {
+            return {
+                tagName: tag.attributes.name,
+                tagID: tag.id
+            }
+        });
+
+        this.setState({
+            dataSource: [{
+                key: 0,
+                eventTags: eventTags
+            }]
+        })
+    };
+
 
     private removeTag = (record: TableRow, tagID: string) => {
         this.setState({isLoading: true});
-
     };
 
     private addTag = (record: TableRow) => {
-
+        this.setState({visible: true});
     };
+
+    handleCancel = () => {
+        this.setState({visible: false});
+    };
+
+    handleCreate = () => {
+        // @ts-ignore
+        const {form} = this.formRef.props;
+        form.validateFields((err: any, values: any) => {
+            if (err) {
+                return;
+            }
+
+            console.log('Received values of form: ', values);
+            form.resetFields();
+            this.setState({visible: false});
+        });
+    };
+
+    saveFormRef = (formRef: any) => {
+        // @ts-ignore
+        this.formRef = formRef;
+    };
+
+    componentDidMount() {
+        this.setEventTags()
+    }
 
     render() {
         let tagPosition = 0;
@@ -125,17 +217,19 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
             }
         }
         ];
-        
+
         return (
-            <Table<TableRow> columns={columns} dataSource={this.state.dataSource}/>
+            <Wrapper>
+                <Table<TableRow> bordered columns={columns} dataSource={this.state.dataSource}/>
+                <FormInModal
+                    wrappedComponentRef={this.saveFormRef}
+                    visible={this.state.visible}
+                    onCancel={this.handleCancel}
+                    onCreate={this.handleCreate}
+                />
+            </Wrapper>
         );
     }
 }
 
-const mapStateToProps = (state: RootState) => {
-    return {};
-};
-
-const mapDispatchToProps = {};
-
-export default connect(mapStateToProps, mapDispatchToProps)(AttendeeTagsComponent);
+export default connect(mapStateToProps, {})(AttendeeTagsComponent);

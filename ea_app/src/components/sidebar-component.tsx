@@ -9,12 +9,13 @@ import MomentTagsComponent from './moment-tags/moment-tags-component';
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
+  margin: 15px;
 `;
 const SidebarWrapper = styled.div`
   min-width: 180px;
   display: flex;
   flex-direction: column;
-  margin: 50px 15px 15px 15px;
+  margin: 50px 15px 0 0;
 `;
 const SidebarItem = styled.div`
    cursor: pointer;
