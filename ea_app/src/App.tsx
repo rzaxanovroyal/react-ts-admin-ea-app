@@ -2,7 +2,7 @@ import React, {PureComponent} from 'react';
 import {connect} from 'react-redux';
 
 import {RootState} from "./store/store";
-import {setEventCode, setEventTags, setXCSRFtoken} from "./store/data/actions";
+import {setEventCode, setEventTags, setTagsParentData, setXCSRFtoken} from "./store/data/actions";
 import {DataState, EventTags} from "./store/data/reducer";
 import axios from "axios";
 import {fetchPassword, fetchUsername, prodURL} from "./shared/keys";
@@ -15,6 +15,9 @@ interface OwnProps {
     setEventCode(eventCode: string): void;
 
     setEventTags(eventTags: EventTags): void;
+
+    setTagsParentData(eventID: string, vocabularyID: string): void;
+
 }
 
 const mapStateToProps = ({data}: RootState): { data: DataState } => ({data});
@@ -48,7 +51,7 @@ class App extends PureComponent<Props, State> {
     }
 
     private fetchEventTags = (): void => {
-        const fetchURL = `${prodURL}/jsonapi/taxonomy_term/attendee_tags?fields[taxonomy_term--attendee_tags]=name&filter[parent.name][value]=${this.props.data.eventCode}`;
+        const fetchURL = `${prodURL}/jsonapi/taxonomy_term/attendee_tags?fields[taxonomy_term--attendee_tags]=name&filter[parent.name][value]=${this.props.data.eventCode}&include=parent,vid`;
 
         axios({
             method: 'get',
@@ -63,8 +66,14 @@ class App extends PureComponent<Props, State> {
             }
         })
             .then((res: any) => {
+                console.log(res);
                 const eventTags = res.data.data;
                 this.props.setEventTags(eventTags);
+                if (res.data.included) {
+                    const eventID = res.data.included[0].id;
+                    const vocabularyID = res.data.included[1].id;
+                    this.props.setTagsParentData(eventID, vocabularyID);
+                }
             })
             .catch(catchError);
     };
@@ -99,4 +108,4 @@ class App extends PureComponent<Props, State> {
     }
 }
 
-export default connect(mapStateToProps, {setEventCode, setXCSRFtoken, setEventTags})(App);
+export default connect(mapStateToProps, {setEventCode, setXCSRFtoken, setEventTags, setTagsParentData})(App);

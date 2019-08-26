@@ -10,7 +10,7 @@ import styled from "styled-components";
 
 // CSS starts
 const Wrapper = styled.div`
- margin-top: 50px;
+ margin-top: 48px;
 `;
 
 // CSS ends
@@ -104,7 +104,7 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
         this.setState({isLoading: true});
     };
 
-    private addTag = (record: TableRow) => {
+    private openModalForm = (record: TableRow) => {
         this.setState({visible: true});
     };
 
@@ -119,8 +119,47 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
             if (err) {
                 return;
             }
+            console.log(values.tag);
 
-            console.log('Received values of form: ', values);
+            /*axios({
+                method: 'post',
+                url: `${prodURL}/jsonapi/taxonomy_term/attendee_tags`,
+                auth: {
+                    username: `${fetchUsername}`,
+                    password: `${fetchPassword}`
+                },
+                headers: {
+                    'Accept': 'application/vnd.api+json',
+                    'Content-Type': 'application/vnd.api+json',
+                    'X-CSRF-Token': this.props.data.XCSRFtoken
+                },
+                data: {
+                    "data": {
+                        "type": "taxonomy_term--attendee_tags",
+                        "attributes": {
+                            "name": values.tag,
+                        },
+                        "relationships": {
+                            "vid": {
+                                "data": {
+                                    "type": "taxonomy_vocabulary--taxonomy_vocabulary",
+                                    "id": ''
+                                }
+                            },
+                            "parent": {
+                                "data": [
+                                    {
+                                        "type": "taxonomy_term--attendee_tags",
+                                        "id": ''
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            })
+                .catch(catchError);*/
+
             form.resetFields();
             this.setState({visible: false});
         });
@@ -208,7 +247,7 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
                         })}
                         < Tag key={index} onClick={(e: any) => {
                             e.preventDefault();
-                            this.addTag(record)
+                            this.openModalForm(record)
                         }} style={{background: '#fff', borderStyle: 'dashed'}}>
                             <Icon type="plus"/> Add Tag
                             </Tag>

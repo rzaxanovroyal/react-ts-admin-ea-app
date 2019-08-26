@@ -1,2 +1,4 @@
-export const TOGGLE_DRAWER = 'TOGGLE_DRAWER';
-export const CALL_METHOD = 'CALL_METHOD';
+export enum ViewActionTypes {
+    'TOGGLE_DRAWER' = 'TOGGLE_DRAWER',
+    'CALL_METHOD' = 'CALL_METHOD'
+}

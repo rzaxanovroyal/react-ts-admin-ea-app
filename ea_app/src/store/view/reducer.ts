@@ -1,4 +1,4 @@
-import {TOGGLE_DRAWER, CALL_METHOD} from './types';
+import {ViewActionTypes} from './types';
 import {ViewActions} from './actions';
 
 export interface ViewState {
@@ -22,13 +22,13 @@ export function viewReducer(
     action: ViewActions
 ): ViewState {
     switch (action.type) {
-        case TOGGLE_DRAWER: {
+        case ViewActionTypes.TOGGLE_DRAWER: {
             return {
                 ...state,
                 DrawerIsVisible: action.payload
             }
         }
-        case CALL_METHOD: {
+        case ViewActionTypes.CALL_METHOD: {
             return {
                 ...state,
                 callMethod: action.payload

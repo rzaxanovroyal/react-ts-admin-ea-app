@@ -1,4 +1,4 @@
-import {SET_LANGUAGE, SET_EVENT_CODE, SET_ATTENDEES, SET_EVENT_TAGS, SET_XCSRF_TOKEN} from './types';
+import {DataActionTypes} from './types';
 import {DataActions} from './actions';
 
 interface FieldAttendeeTagsData {
@@ -46,6 +46,10 @@ export interface DataState {
     attendees: AttendeeData;
     eventTags: EventTags[];
     XCSRFtoken: string;
+    tagsParentData: {
+        eventID: string,
+        vocabularyID: string
+    }
 }
 
 export const initialState: DataState = {
@@ -82,6 +86,10 @@ export const initialState: DataState = {
         id: 'empty'
     }],
     XCSRFtoken: 'empty',
+    tagsParentData: {
+        eventID: 'empty',
+        vocabularyID: 'empty'
+    }
 };
 
 export function dataReducer(
@@ -89,34 +97,40 @@ export function dataReducer(
     action: DataActions
 ): DataState {
     switch (action.type) {
-        case SET_EVENT_CODE: {
+        case DataActionTypes.SET_EVENT_CODE: {
             return {
                 ...state,
                 eventCode: action.payload
             }
         }
-        case SET_LANGUAGE: {
+        case DataActionTypes.SET_LANGUAGE: {
             return {
                 ...state,
                 language: action.payload
             }
         }
-        case SET_ATTENDEES: {
+        case DataActionTypes.SET_ATTENDEES: {
             return {
                 ...state,
                 attendees: action.payload
             }
         }
-        case SET_EVENT_TAGS: {
+        case DataActionTypes.SET_EVENT_TAGS: {
             return {
                 ...state,
                 eventTags: action.payload
             }
         }
-        case SET_XCSRF_TOKEN: {
+        case DataActionTypes.SET_XCSRF_TOKEN: {
             return {
                 ...state,
                 XCSRFtoken: action.payload
+            }
+        }
+        case DataActionTypes.SET_TAGS_PARENT_DATA: {
+            return {
+                ...state,
+                tagsParentData: action.payload
             }
         }
         default:

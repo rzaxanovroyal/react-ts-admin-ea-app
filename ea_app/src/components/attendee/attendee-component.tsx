@@ -99,7 +99,7 @@ export interface EventTag {
     attendeeID?: string;
 }
 
-interface Attendee {
+export interface Attendee {
     key: number;
     firstName: string;
     lastName?: string;
@@ -369,7 +369,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                         }
                     }
                 })
-                    .catch((error: any) => console.log(error));
+                    .catch(catchError);
             })
             .then(res => {
                 this.fetchAttendees()

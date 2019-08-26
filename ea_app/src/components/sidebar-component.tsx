@@ -20,7 +20,7 @@ const SidebarWrapper = styled.div`
     @media(min-width: 1400px) {
       grid-column-start: 2;
   }
-  margin: 50px 15px 0 0;
+  margin: 48px 15px 0 0;
 `;
 const SidebarItem = styled.div`
    cursor: pointer;

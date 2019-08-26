@@ -1,15 +1,16 @@
-import {SET_LANGUAGE, SET_EVENT_CODE, SET_ATTENDEES, SET_EVENT_TAGS, SET_XCSRF_TOKEN} from './types';
+import {DataActionTypes} from './types';
 import {Dispatch} from "redux";
 
 export interface DataActions {
-    type: 'SET_LANGUAGE' | 'SET_EVENT_CODE' | 'SET_ATTENDEES' | 'SET_EVENT_TAGS' | 'SET_XCSRF_TOKEN';
+    type: DataActionTypes.SET_LANGUAGE | DataActionTypes.SET_EVENT_CODE | DataActionTypes.SET_ATTENDEES | DataActionTypes.SET_EVENT_TAGS | DataActionTypes.SET_XCSRF_TOKEN
+        | DataActionTypes.SET_TAGS_PARENT_DATA;
     payload: any;
 }
 
 // Set Event code
 export const setEventCode = (response: any) => (dispatch: Dispatch) => {
     dispatch<DataActions>({
-        type: SET_EVENT_CODE,
+        type: DataActionTypes.SET_EVENT_CODE,
         payload: response
     })
 };
@@ -17,7 +18,7 @@ export const setEventCode = (response: any) => (dispatch: Dispatch) => {
 // Set language
 export const setLanguage = (response: any) => (dispatch: Dispatch) => {
     dispatch<DataActions>({
-        type: SET_LANGUAGE,
+        type: DataActionTypes.SET_LANGUAGE,
         payload: response
     })
 };
@@ -25,21 +26,31 @@ export const setLanguage = (response: any) => (dispatch: Dispatch) => {
 // Set Attendees
 export const setAttendees = (response: any) => (dispatch: Dispatch) => {
     dispatch<DataActions>({
-        type: SET_ATTENDEES,
+        type: DataActionTypes.SET_ATTENDEES,
         payload: response
     })
 };
 // Set Attendees
 export const setEventTags = (response: any) => (dispatch: Dispatch) => {
     dispatch<DataActions>({
-        type: SET_EVENT_TAGS,
+        type: DataActionTypes.SET_EVENT_TAGS,
         payload: response
     })
 };
 // Set setXCSRFtoken
 export const setXCSRFtoken = (response: any) => (dispatch: Dispatch) => {
     dispatch<DataActions>({
-        type: SET_XCSRF_TOKEN,
+        type: DataActionTypes.SET_XCSRF_TOKEN,
         payload: response
+    })
+};
+// Set Tags Parent Data
+export const setTagsParentData = (eventID: string, vocabularyID: string) => (dispatch: Dispatch) => {
+    dispatch<DataActions>({
+        type: DataActionTypes.SET_TAGS_PARENT_DATA,
+        payload: {
+            eventID: eventID,
+            vocabularyID: vocabularyID
+        }
     })
 };
