@@ -2,16 +2,19 @@ import React, {PureComponent} from 'react';
 import {connect} from 'react-redux';
 
 import {RootState} from "./store/store";
-import {setEventCode, setXCSRFtoken} from "./store/data/actions";
-import {DataState} from "./store/data/reducer";
+import {setEventCode, setEventTags, setXCSRFtoken} from "./store/data/actions";
+import {DataState, EventTags} from "./store/data/reducer";
 import axios from "axios";
-import {prodURL} from "./shared/keys";
+import {fetchPassword, fetchUsername, prodURL} from "./shared/keys";
 import SidebarComponent from "./components/sidebar-component";
+import {catchError} from "./shared/common-methods";
 
 interface OwnProps {
     setXCSRFtoken(XCSRFtoken: string): void;
 
     setEventCode(eventCode: string): void;
+
+    setEventTags(eventTags: EventTags): void;
 }
 
 const mapStateToProps = ({data}: RootState): { data: DataState } => ({data});
@@ -27,7 +30,7 @@ class App extends PureComponent<Props, State> {
         isLoading: true
     };
 
-    getXCSRFToken() {
+    private getXCSRFToken = (): void => {
         const fetchURL = `${prodURL}/rest/session/token`;
 
         axios({
@@ -41,15 +44,38 @@ class App extends PureComponent<Props, State> {
             .then(response => {
                 this.props.setXCSRFtoken(response.data)
             })
-            .catch(error => console.log(error));
+            .catch(catchError);
     }
 
-    componentDidMount(): void {
+    private fetchEventTags = (): void => {
+        const fetchURL = `${prodURL}/jsonapi/taxonomy_term/attendee_tags?fields[taxonomy_term--attendee_tags]=name&filter[parent.name][value]=${this.props.data.eventCode}`;
+
+        axios({
+            method: 'get',
+            url: `${fetchURL}`,
+            auth: {
+                username: `${fetchUsername}`,
+                password: `${fetchPassword}`
+            },
+            headers: {
+                'Accept': 'application/vnd.api+json',
+                'Content-Type': 'application/vnd.api+json',
+            }
+        })
+            .then((res: any) => {
+                const eventTags = res.data.data;
+                this.props.setEventTags(eventTags);
+            })
+            .catch(catchError);
+    };
+
+    async componentDidMount() {
         this.getXCSRFToken();
         /*global drupalSettings:true*/
         /*eslint no-undef: "error"*/
         // @ts-ignore
-        this.props.setEventCode('039214');//'039214'//drupalSettings.eventAccessCode
+        await this.props.setEventCode('039214');//'039214'//drupalSettings.eventAccessCode
+        await this.fetchEventTags();
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
@@ -73,4 +99,4 @@ class App extends PureComponent<Props, State> {
     }
 }
 
-export default connect(mapStateToProps, {setEventCode, setXCSRFtoken})(App);
+export default connect(mapStateToProps, {setEventCode, setXCSRFtoken, setEventTags})(App);

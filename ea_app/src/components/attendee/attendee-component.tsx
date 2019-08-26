@@ -4,7 +4,7 @@ import {RootState} from "../../store/store";
 import {fetchPassword, fetchUsername, prodURL} from "../../shared/keys";
 import axios from "axios";
 
-import {AttendeeData, DataState, EventTags} from "../../store/data/reducer";
+import {AttendeeData, DataState} from "../../store/data/reducer";
 import {setAttendees, setEventTags} from "../../store/data/actions";
 import {callMethod, toggleDrawer} from "../../store/view/actions";
 
@@ -12,6 +12,7 @@ import {Button, Form, Icon, Input, InputNumber, Popconfirm, Spin, Table, Tag} fr
 import {FormComponentProps} from 'antd/lib/form';
 import DrawerTagsComponent from "./drawer-tags-component"
 import {ViewState} from "../../store/view/reducer";
+import {catchError} from "../../shared/common-methods";
 
 // @ts-ignore
 const EditableContext = React.createContext();
@@ -83,8 +84,6 @@ class EditableCell extends PureComponent<EditableCellProps, EditableCellState> {
 interface OwnProps extends FormComponentProps {
     setAttendees(attendees: AttendeeData): void;
 
-    setEventTags(eventTags: EventTags): void;
-
     toggleDrawer(drawerStatus: boolean, record: Attendee): void;
 
     callMethod(method: string): void;
@@ -94,7 +93,7 @@ const mapStateToProps = ({data, view}: RootState): { data: DataState, view: View
 
 type Props = OwnProps & ReturnType<typeof mapStateToProps>;
 
-export interface eventTag {
+export interface EventTag {
     tagName: string;
     tagID: string;
     attendeeID?: string;
@@ -105,7 +104,7 @@ interface Attendee {
     firstName: string;
     lastName?: string;
     email: string;
-    attendeeTags: eventTag[]
+    attendeeTags: EventTag[]
 }
 
 interface newAttendee {
@@ -114,7 +113,7 @@ interface newAttendee {
     field_full_name: string;
 }
 
-interface Columns {
+export interface Columns {
     dataIndex?: string;
     render?: (text: any, record: Attendee, index?: number | undefined) => any;
     title: string;
@@ -195,7 +194,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
             .then(res => {
                 this.fetchAttendees()
             })
-            .catch(error => console.log(error));
+            .catch(catchError);
     };
 
     private addTag = (record: Attendee) => {
@@ -227,24 +226,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 console.log(res);
                 this.fetchAttendees()
             })
-            .catch(function (error) {
-                if (error.response) {
-                    // The request was made and the server responded with a status code
-                    // that falls out of the range of 2xx
-                    console.log(error.response.data);
-                    console.log(error.response.status);
-                    console.log(error.response.headers);
-                } else if (error.request) {
-                    // The request was made but no response was received
-                    // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                    // http.ClientRequest in node.js
-                    console.log(error.request);
-                } else {
-                    // Something happened in setting up the request that triggered an Error
-                    console.log('Error', error.message);
-                }
-                console.log(error.config);
-            });
+            .catch(catchError);
     };
 
     isEditing = (record: any) => record.key === this.state.editingRow;
@@ -320,24 +302,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     }
                 }
             })
-                .catch(function (error) {
-                    if (error.response) {
-                        // The request was made and the server responded with a status code
-                        // that falls out of the range of 2xx
-                        console.log(error.response.data);
-                        console.log(error.response.status);
-                        console.log(error.response.headers);
-                    } else if (error.request) {
-                        // The request was made but no response was received
-                        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                        // http.ClientRequest in node.js
-                        console.log(error.request);
-                    } else {
-                        // Something happened in setting up the request that triggered an Error
-                        console.log('Error', error.message);
-                    }
-                    console.log(error.config);
-                });
+                .catch(catchError);
         });
     };
 
@@ -376,7 +341,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                             "mail": {"value": enteredEmail}
                         }
                     })
-                        .catch((error: any) => console.log(error));
+                        .catch(catchError);
                 }
             })
             .then(res => {
@@ -409,11 +374,11 @@ class AttendeeComponent extends PureComponent<Props, State> {
             .then(res => {
                 this.fetchAttendees()
             })
-            .catch((error: any) => console.log(error));
+            .catch(catchError);
     };
 
     private fetchAttendees = (): void => {
-        const fetchURL = `${prodURL}/jsonapi/node/attendee/?filter[field_event_reference.field_event_access_code][value]=${this.props.data.eventCode}&fields[user--user]=name,mail&include=field_attendee_tags.vid&fields[node--attendee]=title,field_first_name,field_last_name,field_attendee_tags&fields[taxonomy_term--attendee_tags]=name`;
+        const fetchURL = `${prodURL}/jsonapi/node/attendee/?filter[field_event_reference.field_event_access_code][value]=${this.props.data.eventCode}&fields[user--user]=name,mail&include=field_attendee_tags.vid&fields[node--attendee]=title,field_first_name,field_last_name,field_attendee_tags,field_event_reference&fields[taxonomy_term--attendee_tags]=name`;
         axios({
             method: 'get',
             url: `${fetchURL}`,
@@ -434,29 +399,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     createAttendeeMode: false
                 });
             })
-            .catch((error: any) => console.log(error));
-    };
-
-    private fetchEventTags = (): void => {
-        const fetchURL = `${prodURL}/jsonapi/taxonomy_term/attendee_tags?fields[taxonomy_term--attendee_tags]=name&filter[parent.name][value]=${this.props.data.eventCode}`;
-
-        axios({
-            method: 'get',
-            url: `${fetchURL}`,
-            auth: {
-                username: `${fetchUsername}`,
-                password: `${fetchPassword}`
-            },
-            headers: {
-                'Accept': 'application/vnd.api+json',
-                'Content-Type': 'application/vnd.api+json',
-            }
-        })
-            .then((res: any) => {
-                const eventTags = res.data.data;
-                this.props.setEventTags(eventTags);
-            })
-            .catch((error: any) => console.log(error));
+            .catch(catchError);
     };
 
     private setDataSource = (): void => {
@@ -465,7 +408,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
         const attendeeTags = attendees.included;
 
         const attendeeData = attendeeNames.map((attendeeName: any, index: number) => {
-            let tags: eventTag[] = [];
+            let tags: EventTag[] = [];
 
             const existingTagIDs: string[] = attendeeName.relationships.field_attendee_tags.data.map((tagID: any) => {
                 return tagID.id
@@ -518,24 +461,15 @@ class AttendeeComponent extends PureComponent<Props, State> {
         });
     };
 
-    componentDidMount()
-        :
-        void {
+    componentDidMount(): void {
         this.fetchAttendees();
-        this.fetchEventTags();
     }
 
-    componentDidUpdate(prevProps
-                           :
-                           Readonly<Props>, prevState
-                           :
-                           Readonly<State>, snapshot ?: any
-    ):
-        void {
-        if (this.props.data.attendees !== prevProps.data.attendees
-        ) {
+    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot ?: any): void {
+        if (this.props.data.attendees !== prevProps.data.attendees) {
             this.setDataSource();
         }
+
         if (this.props.view.callMethod !== prevProps.view.callMethod) {
             switch (this.props.view.callMethod) {
                 case 'fetchAttendees':
@@ -644,7 +578,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     }
                     return (
                         <span>
-                        {tags.map((tag: eventTag) => {
+                        {tags.map((tag: EventTag) => {
                             let color;
                             switch (tagPosition) {
                                 case 0:

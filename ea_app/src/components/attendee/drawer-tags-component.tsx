@@ -8,8 +8,9 @@ import {DataState} from "../../store/data/reducer";
 import {Button, Drawer, Tag} from 'antd';
 import {ViewState} from "../../store/view/reducer";
 import {callMethod, toggleDrawer} from "../../store/view/actions";
-import {eventTag} from "./attendee-component";
+import {EventTag} from "./attendee-component";
 import _ from 'lodash';
+import {catchError} from "../../shared/common-methods";
 
 // CSS starts
 const DrawerButtonContainer = styled.div`
@@ -37,8 +38,8 @@ const mapStateToProps = ({data, view}: RootState): { data: DataState, view: View
 type Props = OwnProps & ReturnType<typeof mapStateToProps>;
 
 type State = Readonly<{
-    selectedTags: eventTag[];
-    eventTags: eventTag[];
+    selectedTags: EventTag[];
+    eventTags: EventTag[];
     isLoading: boolean;
     allowedTagsPerAttendee: number;
 }>;
@@ -87,7 +88,7 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
         const attendeeID = this.props.data.attendees.data[attendeeIndex].id;
         const currentTags = this.props.data.attendees.data[attendeeIndex].relationships.field_attendee_tags.data;
 
-        const newTags = selectedTags.map((tag: eventTag) => {
+        const newTags = selectedTags.map((tag: EventTag) => {
             return {
                 type: 'taxonomy_term--attendee_tags',
                 id: tag.tagID
@@ -130,7 +131,7 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
                 });
                 setTimeout(this.clearAllowedTagsPerAttendee, 500);
             })
-            .catch(error => console.log(error));
+            .catch(catchError);
     };
 
     private setTagsForCurrentAttendee = (): void => {
@@ -145,7 +146,7 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
             }
         });
 
-        uniqueTags = eventTags.filter((o: eventTag) => attendeeTags.every((p: eventTag) => !['tagID'].some(k => o.tagID === p.tagID)));
+        uniqueTags = eventTags.filter((o: EventTag) => attendeeTags.every((p: EventTag) => !['tagID'].some(k => o.tagID === p.tagID)));
 
         this.setState({
             eventTags: uniqueTags,
@@ -194,7 +195,6 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
             </Drawer>
         );
     }
-
 }
 
 export default connect(mapStateToProps, {toggleDrawer, callMethod})(DrawerTagsComponent);
