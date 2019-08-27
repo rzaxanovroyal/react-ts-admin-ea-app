@@ -6,7 +6,10 @@
       <change beforePath="$PROJECT_DIR$/ea_app/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/App.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ea_app/src/components/attendee-tags/attendee-tags-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/components/attendee-tags/attendee-tags-component.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ea_app/src/components/attendee/attendee-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/components/attendee/attendee-component.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea_app/src/components/moment-tags/moment-tags-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/components/moment-tags/moment-tags-component.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea_app/src/store/data/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/store/data/actions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea_app/src/store/data/reducer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/store/data/reducer.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea_app/src/store/data/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/store/data/types.ts" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -85,7 +88,7 @@
       <workItem from="1566799324183" duration="22284000" />
       <workItem from="1566835596215" duration="13853000" />
       <workItem from="1566887626529" duration="5446000" />
-      <workItem from="1566903505711" duration="3451000" />
+      <workItem from="1566903505711" duration="17521000" />
     </task>
     <task id="LOCAL-00001" summary="Add new event tags feature">
       <created>1566894160331</created>
@@ -94,7 +97,14 @@
       <option name="project" value="LOCAL" />
       <updated>1566894160331</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Finish attendee tag component and prevent from attendee data refetching">
+      <created>1566907028420</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1566907028420</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -115,6 +125,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Add new event tags feature" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add new event tags feature" />
+    <MESSAGE value="Finish attendee tag component and prevent from attendee data refetching" />
+    <option name="LAST_COMMIT_MESSAGE" value="Finish attendee tag component and prevent from attendee data refetching" />
   </component>
 </project>

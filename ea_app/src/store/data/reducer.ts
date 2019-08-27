@@ -45,11 +45,16 @@ export interface DataState {
     language: string;
     attendees: AttendeeData;
     eventTags: EventTags[];
+    momentTags: EventTags[];
     XCSRFtoken: string;
-    tagsParentData: {
-        eventID: string,
-        vocabularyID: string
-    }
+    tagParentEvents: {
+        attendeeEventID: string,
+        momentEventID: string
+    };
+    tagTaxonomyVocabularies: {
+        attendeeVocabularyID: string,
+        momentVocabularyID: string
+    };
 }
 
 export const initialState: DataState = {
@@ -85,10 +90,20 @@ export const initialState: DataState = {
         },
         id: 'empty'
     }],
+    momentTags: [{
+        attributes: {
+            name: 'empty'
+        },
+        id: 'empty'
+    }],
     XCSRFtoken: 'empty',
-    tagsParentData: {
-        eventID: 'empty',
-        vocabularyID: 'empty'
+    tagParentEvents: {
+        attendeeEventID: 'empty',
+        momentEventID: 'empty'
+    },
+    tagTaxonomyVocabularies: {
+        attendeeVocabularyID: 'empty',
+        momentVocabularyID: 'empty'
     }
 };
 
@@ -121,16 +136,28 @@ export function dataReducer(
                 eventTags: action.payload
             }
         }
+        case DataActionTypes.SET_MOMENT_TAGS: {
+            return {
+                ...state,
+                momentTags: action.payload
+            }
+        }
         case DataActionTypes.SET_XCSRF_TOKEN: {
             return {
                 ...state,
                 XCSRFtoken: action.payload
             }
         }
-        case DataActionTypes.SET_TAGS_PARENT_DATA: {
+        case DataActionTypes.SET_TAG_PARENT_EVENTS: {
             return {
                 ...state,
-                tagsParentData: action.payload
+                tagParentEvents: action.payload
+            }
+        }
+        case DataActionTypes.SET_TAG_TAXONOMY_VOCABULARIES: {
+            return {
+                ...state,
+                tagTaxonomyVocabularies: action.payload
             }
         }
         default:

@@ -3,7 +3,7 @@ import {Dispatch} from "redux";
 
 export interface DataActions {
     type: DataActionTypes.SET_LANGUAGE | DataActionTypes.SET_EVENT_CODE | DataActionTypes.SET_ATTENDEES | DataActionTypes.SET_EVENT_TAGS | DataActionTypes.SET_XCSRF_TOKEN
-        | DataActionTypes.SET_TAGS_PARENT_DATA;
+        | DataActionTypes.SET_TAG_PARENT_EVENTS | DataActionTypes.SET_TAG_TAXONOMY_VOCABULARIES | DataActionTypes.SET_MOMENT_TAGS;
     payload: any;
 }
 
@@ -30,10 +30,17 @@ export const setAttendees = (response: any) => (dispatch: Dispatch) => {
         payload: response
     })
 };
-// Set Attendees
+// Set Event tags
 export const setEventTags = (response: any) => (dispatch: Dispatch) => {
     dispatch<DataActions>({
         type: DataActionTypes.SET_EVENT_TAGS,
+        payload: response
+    })
+};
+// Set Moment tags
+export const setMomentTags = (response: any) => (dispatch: Dispatch) => {
+    dispatch<DataActions>({
+        type: DataActionTypes.SET_MOMENT_TAGS,
         payload: response
     })
 };
@@ -44,13 +51,23 @@ export const setXCSRFtoken = (response: any) => (dispatch: Dispatch) => {
         payload: response
     })
 };
-// Set Tags Parent Data
-export const setTagsParentData = (eventID: string, vocabularyID: string) => (dispatch: Dispatch) => {
+// Set Tags Parent Events IDs
+export const setTagParentEvents = (attendeeEventID: string, momentEventID: string) => (dispatch: Dispatch) => {
     dispatch<DataActions>({
-        type: DataActionTypes.SET_TAGS_PARENT_DATA,
+        type: DataActionTypes.SET_TAG_PARENT_EVENTS,
         payload: {
-            eventID: eventID,
-            vocabularyID: vocabularyID
+            attendeeEventID: attendeeEventID,
+            momentEventID: momentEventID
+        }
+    })
+};
+// Set Tags Taxonomy Vocabularies IDs
+export const setTagTaxonomyVocabularies = (attendeeVocabularyID: string, momentVocabularyID: string) => (dispatch: Dispatch) => {
+    dispatch<DataActions>({
+        type: DataActionTypes.SET_TAG_TAXONOMY_VOCABULARIES,
+        payload: {
+            attendeeVocabularyID: attendeeVocabularyID,
+            momentVocabularyID: momentVocabularyID
         }
     })
 };

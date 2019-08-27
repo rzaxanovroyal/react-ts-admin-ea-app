@@ -500,8 +500,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 key: 'firstName',
                 editable: true,
                 sorter: (a, b) => {
-                    a = a.firstName || 'z';
-                    b = b.firstName || 'z';
+                    a = a.firstName || 'zzz';
+                    b = b.firstName || 'zzz';
                     return a.localeCompare(b);
                 },
                 sortDirections: ['ascend', 'descend']
@@ -513,8 +513,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 editable: true,
                 defaultSortOrder: 'ascend',
                 sorter: (a, b) => {
-                    a = a.lastName || 'z';
-                    b = b.lastName || 'z';
+                    a = a.lastName || 'zzz';
+                    b = b.lastName || 'zzz';
                     return a.localeCompare(b);
                 },
                 sortDirections: ['ascend', 'descend']
@@ -525,8 +525,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 key: 'email',
                 editable: this.state.createAttendeeMode,
                 sorter: (a, b) => {
-                    a = a.email || 'z';
-                    b = b.email || 'z';
+                    a = a.email || 'zzz';
+                    b = b.email || 'zzz';
                     return a.localeCompare(b);
                 },
                 sortDirections: ['ascend', 'descend']

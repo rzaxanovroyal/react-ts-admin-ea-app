@@ -169,14 +169,14 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
                             "vid": {
                                 "data": {
                                     "type": "taxonomy_vocabulary--taxonomy_vocabulary",
-                                    "id": this.props.data.tagsParentData.vocabularyID
+                                    "id": this.props.data.tagTaxonomyVocabularies.attendeeVocabularyID
                                 }
                             },
                             "parent": {
                                 "data": [
                                     {
                                         "type": "taxonomy_term--attendee_tags",
-                                        "id": this.props.data.tagsParentData.eventID
+                                        "id": this.props.data.tagParentEvents.attendeeEventID
                                     }
                                 ]
                             }
@@ -266,6 +266,9 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
                                 default:
                                     color = 'lime';
                                     break
+                            }
+                            if (tag.tagID === 'empty') {
+                                return null
                             }
                             return (
                                 this.state.isLoading ?

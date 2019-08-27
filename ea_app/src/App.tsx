@@ -2,7 +2,15 @@ import React, {PureComponent} from 'react';
 import {connect} from 'react-redux';
 
 import {RootState} from "./store/store";
-import {setEventCode, setEventTags, setTagsParentData, setXCSRFtoken, setAttendees} from "./store/data/actions";
+import {
+    setEventCode,
+    setEventTags,
+    setMomentTags,
+    setXCSRFtoken,
+    setAttendees,
+    setTagParentEvents,
+    setTagTaxonomyVocabularies
+} from "./store/data/actions";
 import {callMethod} from "./store/view/actions";
 import {AttendeeData, DataState, EventTags} from "./store/data/reducer";
 import axios from "axios";
@@ -18,7 +26,11 @@ interface OwnProps {
 
     setEventTags(eventTags: EventTags): void;
 
-    setTagsParentData(eventID: string, vocabularyID: string): void;
+    setMomentTags(eventTags: EventTags): void;
+
+    setTagParentEvents(attendeeEventID: string, momentEventID: string): void;
+
+    setTagTaxonomyVocabularies(attendeeVocabularyID: string, momentVocabularyID: string): void;
 
     callMethod(method: string): void;
 
@@ -98,12 +110,84 @@ class App extends PureComponent<Props, State> {
             .then((res: any) => {
                 const eventTags = res.data.data;
                 this.props.setEventTags(eventTags);
+            })
+            .catch(catchError);
+    };
 
-                if (res.data.included) {
-                    const eventID = res.data.included[0].id;
-                    const vocabularyID = res.data.included[1].id;
-                    this.props.setTagsParentData(eventID, vocabularyID);
-                }
+    private fetchMomentTags = (): void => {
+        const fetchURL = `${prodURL}/jsonapi/taxonomy_term/moment_tags?fields[taxonomy_term--moment_tags]=name&filter[parent.name][value]=${this.props.data.eventCode}&include=parent,vid`;
+
+        axios({
+            method: 'get',
+            url: `${fetchURL}`,
+            auth: {
+                username: `${fetchUsername}`,
+                password: `${fetchPassword}`
+            },
+            headers: {
+                'Accept': 'application/vnd.api+json',
+                'Content-Type': 'application/vnd.api+json',
+            }
+        })
+            .then((res: any) => {
+                const momentTags = res.data.data;
+                this.props.setMomentTags(momentTags);
+            })
+            .catch(catchError);
+    };
+
+    private fetchTagsParentEvent = (): void => {
+        const fetchURL = `${prodURL}/jsonapi/node/event?filter[field_event_access_code]=${this.props.data.eventCode}&fields[node--event]=field_event_attendee_tags,field_event_moment_tags`;
+
+        axios({
+            method: 'get',
+            url: `${fetchURL}`,
+            auth: {
+                username: `${fetchUsername}`,
+                password: `${fetchPassword}`
+            },
+            headers: {
+                'Accept': 'application/vnd.api+json',
+                'Content-Type': 'application/vnd.api+json',
+            }
+        })
+            .then((res: any) => {
+                const attendeeEventID = res.data.data[0].relationships.field_event_attendee_tags.data.id;
+                const momentEventID = res.data.data[0].relationships.field_event_moment_tags.data[0].id;
+
+                this.props.setTagParentEvents(attendeeEventID, momentEventID);
+            })
+            .catch(catchError);
+    };
+
+    private fetchTaxonomyVocabularyID = (): void => {
+        const fetchURL = `${prodURL}/jsonapi/taxonomy_vocabulary/taxonomy_vocabulary?fields[taxonomy_vocabulary--taxonomy_vocabulary]=name`;
+
+        axios({
+            method: 'get',
+            url: `${fetchURL}`,
+            auth: {
+                username: `${fetchUsername}`,
+                password: `${fetchPassword}`
+            },
+            headers: {
+                'Accept': 'application/vnd.api+json',
+                'Content-Type': 'application/vnd.api+json',
+            }
+        })
+            .then((res: any) => {
+                const taxonomyData = res.data.data;
+                let attendeeVocabularyID = '';
+                let momentVocabularyID = '';
+
+                taxonomyData.map((vocabulary: any) => {
+                    if (vocabulary.attributes.name === 'Attendee Tags') {
+                        attendeeVocabularyID = vocabulary.id
+                    } else if (vocabulary.attributes.name === 'Moment Tags') {
+                        momentVocabularyID = vocabulary.id
+                    }
+                });
+                this.props.setTagTaxonomyVocabularies(attendeeVocabularyID, momentVocabularyID)
             })
             .catch(catchError);
     };
@@ -113,10 +197,12 @@ class App extends PureComponent<Props, State> {
         /*global drupalSettings:true*/
         /*eslint no-undef: "error"*/
         // @ts-ignore
-        await this.props.setEventCode('039214');//'039214'//drupalSettings.eventAccessCode
+        await this.props.setEventCode('039214');//'039214'//drupalSettings.eventAccessCode//'332280'
         await this.fetchEventTags();
         await this.fetchAttendees();
-
+        await this.fetchMomentTags();
+        await this.fetchTagsParentEvent();
+        await this.fetchTaxonomyVocabularyID();
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
@@ -124,6 +210,10 @@ class App extends PureComponent<Props, State> {
             switch (this.props.view.callMethod) {
                 case 'fetchEventTags':
                     this.fetchEventTags();
+                    this.props.callMethod('');
+                    break;
+                case 'fetchMomentTags':
+                    this.fetchMomentTags();
                     this.props.callMethod('');
                     break;
                 case 'fetchAttendees':
@@ -150,6 +240,7 @@ export default connect(mapStateToProps, {
     setEventCode,
     setXCSRFtoken,
     setEventTags,
-    setTagsParentData,
+    setMomentTags,
+    setTagParentEvents, setTagTaxonomyVocabularies,
     callMethod
 })(App);
