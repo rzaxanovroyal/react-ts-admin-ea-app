@@ -2,18 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3277053e-f289-41bc-85da-c6819d4f9bb8" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/saveactions_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/saveactions_settings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ea_app/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/App.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ea_app/src/components/attendee-tags/attendee-tags-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/components/attendee-tags/attendee-tags-component.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/components/attendee/attendee-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/components/attendee/attendee-component.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/components/sidebar-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/components/sidebar-component.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/store/data/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/store/data/actions.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/store/data/reducer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/store/data/reducer.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/store/data/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/store/data/types.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/store/view/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/store/view/actions.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/store/view/reducer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/store/view/reducer.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/store/view/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/store/view/types.ts" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -48,7 +40,7 @@
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="editing.templates" />
+    <property name="settings.editor.selected.configurable" value="settings.saveactions" />
     <property name="ts.external.directory.path" value="C:\server\EventStory\event-admin\ea_app\node_modules\typescript\lib" />
   </component>
   <component name="RecentsManager">
@@ -90,7 +82,8 @@
       <workItem from="1566725429166" duration="15371000" />
       <workItem from="1566743942607" duration="142000" />
       <workItem from="1566799324183" duration="22284000" />
-      <workItem from="1566835596215" duration="13725000" />
+      <workItem from="1566835596215" duration="13853000" />
+      <workItem from="1566887626529" duration="4823000" />
     </task>
     <servers />
   </component>

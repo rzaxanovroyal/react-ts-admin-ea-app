@@ -4,9 +4,15 @@ import {RootState} from "../../store/store";
 import {Form, Icon, Input, Modal, Spin, Table, Tag} from "antd";
 import {ColumnProps} from 'antd/es/table';
 import {FormComponentProps} from 'antd/es/form';
+import styled from "styled-components";
+import axios from "axios";
+import {catchError} from "../../shared/common-methods";
+
 import {EventTag} from "../attendee/attendee-component";
 import {DataState} from "../../store/data/reducer";
-import styled from "styled-components";
+import {fetchPassword, fetchUsername, prodURL} from "../../shared/keys";
+import {ViewState} from "../../store/view/reducer";
+import {callMethod} from "../../store/view/actions";
 
 // CSS starts
 const Wrapper = styled.div`
@@ -51,6 +57,8 @@ const FormInModal = Form.create<EventTagFormProps>({name: 'form_in_modal'})(
 const spinIcon = <Icon type="loading" style={{fontSize: 6, marginLeft: 7, marginRight: 5, verticalAlign: 3}} spin/>;
 
 interface OwnProps {
+    callMethod(method: string): void;
+
 }
 
 interface TableRow {
@@ -58,7 +66,7 @@ interface TableRow {
     eventTags: EventTag[];
 }
 
-const mapStateToProps = ({data}: RootState): { data: DataState } => ({data});
+const mapStateToProps = ({data, view}: RootState): { data: DataState, view: ViewState } => ({data, view});
 
 type Props = OwnProps & ReturnType<typeof mapStateToProps>
 
@@ -77,7 +85,7 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
                 tagName: ''
             }],
         }],
-        isLoading: false,
+        isLoading: true,
         visible: false
     };
 
@@ -95,7 +103,9 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
             dataSource: [{
                 key: 0,
                 eventTags: eventTags
-            }]
+            }],
+            isLoading: false
+
         })
     };
 
@@ -119,9 +129,9 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
             if (err) {
                 return;
             }
-            console.log(values.tag);
+            this.setState({isLoading: true});
 
-            /*axios({
+            axios({
                 method: 'post',
                 url: `${prodURL}/jsonapi/taxonomy_term/attendee_tags`,
                 auth: {
@@ -143,14 +153,14 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
                             "vid": {
                                 "data": {
                                     "type": "taxonomy_vocabulary--taxonomy_vocabulary",
-                                    "id": ''
+                                    "id": this.props.data.tagsParentData.vocabularyID
                                 }
                             },
                             "parent": {
                                 "data": [
                                     {
                                         "type": "taxonomy_term--attendee_tags",
-                                        "id": ''
+                                        "id": this.props.data.tagsParentData.eventID
                                     }
                                 ]
                             }
@@ -158,7 +168,10 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
                     }
                 }
             })
-                .catch(catchError);*/
+                .then(res => {
+                    this.props.callMethod('fetchEventTags');
+                })
+                .catch(catchError);
 
             form.resetFields();
             this.setState({visible: false});
@@ -170,8 +183,16 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
         this.formRef = formRef;
     };
 
-    componentDidMount() {
+    componentDidMount(): void {
         this.setEventTags()
+    }
+
+
+    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+        if (this.props.data.eventTags !== prevProps.data.eventTags) {
+            this.setEventTags()
+        }
+
     }
 
     render() {
@@ -271,4 +292,4 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
     }
 }
 
-export default connect(mapStateToProps, {})(AttendeeTagsComponent);
+export default connect(mapStateToProps, {callMethod})(AttendeeTagsComponent);

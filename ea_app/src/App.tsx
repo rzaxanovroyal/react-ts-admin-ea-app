@@ -3,11 +3,13 @@ import {connect} from 'react-redux';
 
 import {RootState} from "./store/store";
 import {setEventCode, setEventTags, setTagsParentData, setXCSRFtoken} from "./store/data/actions";
+import {callMethod} from "./store/view/actions";
 import {DataState, EventTags} from "./store/data/reducer";
 import axios from "axios";
 import {fetchPassword, fetchUsername, prodURL} from "./shared/keys";
 import SidebarComponent from "./components/sidebar-component";
 import {catchError} from "./shared/common-methods";
+import {ViewState} from "./store/view/reducer";
 
 interface OwnProps {
     setXCSRFtoken(XCSRFtoken: string): void;
@@ -18,9 +20,10 @@ interface OwnProps {
 
     setTagsParentData(eventID: string, vocabularyID: string): void;
 
+    callMethod(method: string): void;
 }
 
-const mapStateToProps = ({data}: RootState): { data: DataState } => ({data});
+const mapStateToProps = ({data, view}: RootState): { data: DataState, view: ViewState } => ({data, view});
 
 type Props = OwnProps & ReturnType<typeof mapStateToProps>;
 
@@ -48,7 +51,7 @@ class App extends PureComponent<Props, State> {
                 this.props.setXCSRFtoken(response.data)
             })
             .catch(catchError);
-    }
+    };
 
     private fetchEventTags = (): void => {
         const fetchURL = `${prodURL}/jsonapi/taxonomy_term/attendee_tags?fields[taxonomy_term--attendee_tags]=name&filter[parent.name][value]=${this.props.data.eventCode}&include=parent,vid`;
@@ -66,9 +69,9 @@ class App extends PureComponent<Props, State> {
             }
         })
             .then((res: any) => {
-                console.log(res);
                 const eventTags = res.data.data;
                 this.props.setEventTags(eventTags);
+
                 if (res.data.included) {
                     const eventID = res.data.included[0].id;
                     const vocabularyID = res.data.included[1].id;
@@ -95,6 +98,15 @@ class App extends PureComponent<Props, State> {
                 isLoading: false
             })
         }
+
+        if (this.props.view.callMethod !== prevProps.view.callMethod) {
+            switch (this.props.view.callMethod) {
+                case 'fetchEventTags':
+                    this.fetchEventTags();
+                    this.props.callMethod('');
+                    break;
+            }
+        }
     }
 
     render() {
@@ -108,4 +120,10 @@ class App extends PureComponent<Props, State> {
     }
 }
 
-export default connect(mapStateToProps, {setEventCode, setXCSRFtoken, setEventTags, setTagsParentData})(App);
+export default connect(mapStateToProps, {
+    setEventCode,
+    setXCSRFtoken,
+    setEventTags,
+    setTagsParentData,
+    callMethod
+})(App);
