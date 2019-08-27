@@ -105,13 +105,29 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
                 eventTags: eventTags
             }],
             isLoading: false
-
         })
     };
 
 
-    private removeTag = (record: TableRow, tagID: string) => {
+    private removeTag = async (record: TableRow, tagID: string) => {
         this.setState({isLoading: true});
+        await axios({
+            method: 'delete',
+            url: `${prodURL}/jsonapi/taxonomy_term/attendee_tags/${tagID}`,
+            auth: {
+                username: `${fetchUsername}`,
+                password: `${fetchPassword}`
+            },
+            headers: {
+                'Accept': 'application/vnd.api+json',
+                'Content-Type': 'application/vnd.api+json',
+                'X-CSRF-Token': this.props.data.XCSRFtoken
+            }
+        })
+            .catch(error => error);
+
+        await this.props.callMethod('fetchEventTags')
+
     };
 
     private openModalForm = (record: TableRow) => {
@@ -192,7 +208,6 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
         if (this.props.data.eventTags !== prevProps.data.eventTags) {
             this.setEventTags()
         }
-
     }
 
     render() {

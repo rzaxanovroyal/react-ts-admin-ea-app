@@ -82,8 +82,6 @@ class EditableCell extends PureComponent<EditableCellProps, EditableCellState> {
 }
 
 interface OwnProps extends FormComponentProps {
-    setAttendees(attendees: AttendeeData): void;
-
     toggleDrawer(drawerStatus: boolean, record: Attendee): void;
 
     callMethod(method: string): void;
@@ -192,7 +190,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
             }
         })
             .then(res => {
-                this.fetchAttendees()
+                this.props.callMethod('fetchAttendees')
             })
             .catch(catchError);
     };
@@ -224,7 +222,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
         })
             .then(res => {
                 console.log(res);
-                this.fetchAttendees()
+                this.props.callMethod('fetchAttendees')
             })
             .catch(catchError);
     };
@@ -372,32 +370,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     .catch(catchError);
             })
             .then(res => {
-                this.fetchAttendees()
-            })
-            .catch(catchError);
-    };
-
-    private fetchAttendees = (): void => {
-        const fetchURL = `${prodURL}/jsonapi/node/attendee/?filter[field_event_reference.field_event_access_code][value]=${this.props.data.eventCode}&fields[user--user]=name,mail&include=field_attendee_tags.vid&fields[node--attendee]=title,field_first_name,field_last_name,field_attendee_tags,field_event_reference&fields[taxonomy_term--attendee_tags]=name`;
-        axios({
-            method: 'get',
-            url: `${fetchURL}`,
-            auth: {
-                username: `${fetchUsername}`,
-                password: `${fetchPassword}`
-            },
-            headers: {
-                'Accept': 'application/vnd.api+json',
-                'Content-Type': 'application/vnd.api+json',
-            }
-        })
-            .then((res) => {
-                const attendees = res.data;
-                this.props.setAttendees(attendees);
-                this.setState({
-                    isLoading: false,
-                    createAttendeeMode: false
-                });
+                this.props.callMethod('fetchAttendees')
             })
             .catch(catchError);
     };
@@ -442,7 +415,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
             }
         });
         this.setState({
-            dataSource: attendeeData
+            dataSource: attendeeData,
+            isLoading: false
         })
     };
 
@@ -462,21 +436,12 @@ class AttendeeComponent extends PureComponent<Props, State> {
     };
 
     componentDidMount(): void {
-        this.fetchAttendees();
+        this.setDataSource();
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot ?: any): void {
         if (this.props.data.attendees !== prevProps.data.attendees) {
             this.setDataSource();
-        }
-
-        if (this.props.view.callMethod !== prevProps.view.callMethod) {
-            switch (this.props.view.callMethod) {
-                case 'fetchAttendees':
-                    this.fetchAttendees();
-                    this.props.callMethod('');
-                    break;
-            }
         }
     }
 
@@ -697,7 +662,6 @@ class AttendeeComponent extends PureComponent<Props, State> {
             </React.Fragment>
         );
     }
-
 }
 
 const WrappedAttendeeComponent = Form.create<EditableCellProps>({name: 'register'})(AttendeeComponent);

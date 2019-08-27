@@ -2,9 +2,9 @@ import React, {PureComponent} from 'react';
 import {connect} from 'react-redux';
 
 import {RootState} from "./store/store";
-import {setEventCode, setEventTags, setTagsParentData, setXCSRFtoken} from "./store/data/actions";
+import {setEventCode, setEventTags, setTagsParentData, setXCSRFtoken, setAttendees} from "./store/data/actions";
 import {callMethod} from "./store/view/actions";
-import {DataState, EventTags} from "./store/data/reducer";
+import {AttendeeData, DataState, EventTags} from "./store/data/reducer";
 import axios from "axios";
 import {fetchPassword, fetchUsername, prodURL} from "./shared/keys";
 import SidebarComponent from "./components/sidebar-component";
@@ -21,6 +21,9 @@ interface OwnProps {
     setTagsParentData(eventID: string, vocabularyID: string): void;
 
     callMethod(method: string): void;
+
+    setAttendees(attendees: AttendeeData): void;
+
 }
 
 const mapStateToProps = ({data, view}: RootState): { data: DataState, view: ViewState } => ({data, view});
@@ -49,6 +52,30 @@ class App extends PureComponent<Props, State> {
         })
             .then(response => {
                 this.props.setXCSRFtoken(response.data)
+            })
+            .catch(catchError);
+    };
+
+    private fetchAttendees = (): void => {
+        const fetchURL = `${prodURL}/jsonapi/node/attendee/?filter[field_event_reference.field_event_access_code][value]=${this.props.data.eventCode}&fields[user--user]=name,mail&include=field_attendee_tags.vid&fields[node--attendee]=title,field_first_name,field_last_name,field_attendee_tags,field_event_reference&fields[taxonomy_term--attendee_tags]=name`;
+        axios({
+            method: 'get',
+            url: `${fetchURL}`,
+            auth: {
+                username: `${fetchUsername}`,
+                password: `${fetchPassword}`
+            },
+            headers: {
+                'Accept': 'application/vnd.api+json',
+                'Content-Type': 'application/vnd.api+json',
+            }
+        })
+            .then((res) => {
+                const attendees = res.data;
+                this.props.setAttendees(attendees);
+                this.setState({
+                    isLoading: false
+                });
             })
             .catch(catchError);
     };
@@ -88,21 +115,19 @@ class App extends PureComponent<Props, State> {
         // @ts-ignore
         await this.props.setEventCode('039214');//'039214'//drupalSettings.eventAccessCode
         await this.fetchEventTags();
+        await this.fetchAttendees();
+
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-        if (this.props.data.eventCode !== prevProps.data.eventCode
-            && this.props.data.eventCode !== 'empty'
-            && this.state.isLoading) {
-            this.setState({
-                isLoading: false
-            })
-        }
-
         if (this.props.view.callMethod !== prevProps.view.callMethod) {
             switch (this.props.view.callMethod) {
                 case 'fetchEventTags':
                     this.fetchEventTags();
+                    this.props.callMethod('');
+                    break;
+                case 'fetchAttendees':
+                    this.fetchAttendees();
                     this.props.callMethod('');
                     break;
             }
@@ -121,6 +146,7 @@ class App extends PureComponent<Props, State> {
 }
 
 export default connect(mapStateToProps, {
+    setAttendees,
     setEventCode,
     setXCSRFtoken,
     setEventTags,
