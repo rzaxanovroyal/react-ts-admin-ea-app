@@ -36,15 +36,16 @@ const FormInModal = Form.create<EventTagFormProps>({name: 'form_in_modal'})(
             const {getFieldDecorator} = form;
             return (
                 <Modal
+                    closable={false}
                     visible={visible}
                     onCancel={onCancel}
                     onOk={onCreate}
                 >
-                    <Form layout="vertical">
-                        <Form.Item label="Attendee Tag">
+                    <Form layout="vertical" hideRequiredMark={true}>
+                        <Form.Item>
                             {getFieldDecorator('tag', {
                                 rules: [{required: true, message: 'Please enter the tag'}],
-                            })(<Input/>)}
+                            })(<Input placeholder="Enter attendee tag"/>)}
                         </Form.Item>
                     </Form>
                 </Modal>
@@ -176,7 +177,7 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
                                 "data": [
                                     {
                                         "type": "taxonomy_term--attendee_tags",
-                                        "id": this.props.data.tagParentEvents.attendeeEventID
+                                        "id": this.props.data.parentEventData.attendeeEventID
                                     }
                                 ]
                             }

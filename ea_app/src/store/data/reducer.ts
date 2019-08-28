@@ -43,13 +43,15 @@ export interface EventTags {
 export interface DataState {
     eventCode: string;
     language: string;
+    userIsAnonymous: boolean;
     attendees: AttendeeData;
     eventTags: EventTags[];
     momentTags: EventTags[];
     XCSRFtoken: string;
-    tagParentEvents: {
-        attendeeEventID: string,
-        momentEventID: string
+    parentEventData: {
+        eventID: string;
+        attendeeEventID: string;
+        momentEventID: string;
     };
     tagTaxonomyVocabularies: {
         attendeeVocabularyID: string,
@@ -60,6 +62,7 @@ export interface DataState {
 export const initialState: DataState = {
     eventCode: 'empty',
     language: 'empty',
+    userIsAnonymous: false,
     attendees: {
         data: [{
             id: 'empty',
@@ -97,7 +100,8 @@ export const initialState: DataState = {
         id: 'empty'
     }],
     XCSRFtoken: 'empty',
-    tagParentEvents: {
+    parentEventData: {
+        eventID: 'empty',
         attendeeEventID: 'empty',
         momentEventID: 'empty'
     },
@@ -124,6 +128,12 @@ export function dataReducer(
                 language: action.payload
             }
         }
+        case DataActionTypes.SET_AUTH_STATUS: {
+            return {
+                ...state,
+                userIsAnonymous: action.payload
+            }
+        }
         case DataActionTypes.SET_ATTENDEES: {
             return {
                 ...state,
@@ -148,10 +158,10 @@ export function dataReducer(
                 XCSRFtoken: action.payload
             }
         }
-        case DataActionTypes.SET_TAG_PARENT_EVENTS: {
+        case DataActionTypes.SET_PARENT_EVENT_DATA: {
             return {
                 ...state,
-                tagParentEvents: action.payload
+                parentEventData: action.payload
             }
         }
         case DataActionTypes.SET_TAG_TAXONOMY_VOCABULARIES: {

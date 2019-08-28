@@ -55,5 +55,5 @@ function event_admin_preprocess_paragraph__event_admin(&$variables) {
   $variables['#attached']['drupalSettings']['language'] = $language;
 
   $isAnonymous = \Drupal::currentUser()->isAnonymous();
-  $variables['#attached']['drupalSettings']['isAnonymous'] = $isAnonymous;
+  $variables['#attached']['drupalSettings']['authStatus'] = $isAnonymous;
 }

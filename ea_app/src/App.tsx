@@ -1,15 +1,17 @@
 import React, {PureComponent} from 'react';
 import {connect} from 'react-redux';
+import styled from "styled-components";
 
 import {RootState} from "./store/store";
 import {
     setEventCode,
+    setAuthStatus,
     setEventTags,
     setMomentTags,
     setXCSRFtoken,
     setAttendees,
-    setTagParentEvents,
-    setTagTaxonomyVocabularies
+    setParentEventData,
+    setTagTaxonomyVocabularies,
 } from "./store/data/actions";
 import {callMethod} from "./store/view/actions";
 import {AttendeeData, DataState, EventTags} from "./store/data/reducer";
@@ -18,17 +20,31 @@ import {fetchPassword, fetchUsername, prodURL} from "./shared/keys";
 import SidebarComponent from "./components/sidebar-component";
 import {catchError} from "./shared/common-methods";
 import {ViewState} from "./store/view/reducer";
+import LoaderComponent from "./components/loader-component";
+
+// CSS starts
+const LoaderWrapper = styled.div`
+ display: grid;
+ grid-template-columns: 1fr;
+ height: 70vh;
+ align-items: center;
+ justify-items: center;
+`;
+
+// CSS ends
 
 interface OwnProps {
     setXCSRFtoken(XCSRFtoken: string): void;
 
     setEventCode(eventCode: string): void;
 
+    setAuthStatus(userIsAnonymous: boolean): void;
+
     setEventTags(eventTags: EventTags): void;
 
     setMomentTags(eventTags: EventTags): void;
 
-    setTagParentEvents(attendeeEventID: string, momentEventID: string): void;
+    setParentEventData(eventID: string, attendeeEventID: string, momentEventID: string): void;
 
     setTagTaxonomyVocabularies(attendeeVocabularyID: string, momentVocabularyID: string): void;
 
@@ -152,10 +168,11 @@ class App extends PureComponent<Props, State> {
             }
         })
             .then((res: any) => {
+                const eventID = res.data.data[0].id;
                 const attendeeEventID = res.data.data[0].relationships.field_event_attendee_tags.data.id;
                 const momentEventID = res.data.data[0].relationships.field_event_moment_tags.data[0].id;
 
-                this.props.setTagParentEvents(attendeeEventID, momentEventID);
+                this.props.setParentEventData(eventID, attendeeEventID, momentEventID);
             })
             .catch(catchError);
     };
@@ -197,7 +214,9 @@ class App extends PureComponent<Props, State> {
         /*global drupalSettings:true*/
         /*eslint no-undef: "error"*/
         // @ts-ignore
-        await this.props.setEventCode('039214');//'039214'//drupalSettings.eventAccessCode//'332280'
+        await this.props.setAuthStatus(drupalSettings.isAnonymous);//true//drupalSettings.authStatus
+        // @ts-ignore
+        await this.props.setEventCode(drupalSettings.eventAccessCode);//'039214'//drupalSettings.eventAccessCode//'332280'
         await this.fetchEventTags();
         await this.fetchAttendees();
         await this.fetchMomentTags();
@@ -225,22 +244,29 @@ class App extends PureComponent<Props, State> {
     }
 
     render() {
-
+        const {userIsAnonymous} = this.props.data;
         return (
             this.state.isLoading ?
-                <h1>Loading...</h1>
+                <LoaderWrapper>
+                    <LoaderComponent/>
+                </LoaderWrapper>
                 :
-                <SidebarComponent/>
+                !userIsAnonymous ?
+                    <SidebarComponent/>
+                    :
+                    <h2>Please log in to proceed</h2>
         );
     }
 }
 
 export default connect(mapStateToProps, {
     setAttendees,
+    setAuthStatus,
     setEventCode,
     setXCSRFtoken,
     setEventTags,
     setMomentTags,
-    setTagParentEvents, setTagTaxonomyVocabularies,
+    setParentEventData,
+    setTagTaxonomyVocabularies,
     callMethod
 })(App);

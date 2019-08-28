@@ -36,15 +36,16 @@ const FormInModal = Form.create<MomentTagFormProps>({name: 'form_in_modal'})(
             const {getFieldDecorator} = form;
             return (
                 <Modal
+                    closable={false}
                     visible={visible}
                     onCancel={onCancel}
                     onOk={onCreate}
                 >
-                    <Form layout="vertical">
-                        <Form.Item label="Moment Tag">
+                    <Form layout="vertical" hideRequiredMark={true}>
+                        <Form.Item>
                             {getFieldDecorator('tag', {
                                 rules: [{required: true, message: 'Please enter the tag'}],
-                            })(<Input/>)}
+                            })(<Input placeholder="Enter moment tag"/>)}
                         </Form.Item>
                     </Form>
                 </Modal>
@@ -176,7 +177,7 @@ class MomentTagsComponent extends PureComponent<Props, State> {
                                 "data": [
                                     {
                                         "type": "taxonomy_term--moment_tags",
-                                        "id": this.props.data.tagParentEvents.momentEventID
+                                        "id": this.props.data.parentEventData.momentEventID
                                     }
                                 ]
                             }

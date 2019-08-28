@@ -3,12 +3,12 @@ import {Dispatch} from "redux";
 
 export interface DataActions {
     type: DataActionTypes.SET_LANGUAGE | DataActionTypes.SET_EVENT_CODE | DataActionTypes.SET_ATTENDEES | DataActionTypes.SET_EVENT_TAGS | DataActionTypes.SET_XCSRF_TOKEN
-        | DataActionTypes.SET_TAG_PARENT_EVENTS | DataActionTypes.SET_TAG_TAXONOMY_VOCABULARIES | DataActionTypes.SET_MOMENT_TAGS;
+        | DataActionTypes.SET_PARENT_EVENT_DATA | DataActionTypes.SET_TAG_TAXONOMY_VOCABULARIES | DataActionTypes.SET_MOMENT_TAGS | DataActionTypes.SET_AUTH_STATUS;
     payload: any;
 }
 
 // Set Event code
-export const setEventCode = (response: any) => (dispatch: Dispatch) => {
+export const setEventCode = (response: string) => (dispatch: Dispatch) => {
     dispatch<DataActions>({
         type: DataActionTypes.SET_EVENT_CODE,
         payload: response
@@ -22,7 +22,13 @@ export const setLanguage = (response: any) => (dispatch: Dispatch) => {
         payload: response
     })
 };
-
+// Set auth status
+export const setAuthStatus = (userIsAnonymous: boolean) => (dispatch: Dispatch) => {
+    dispatch<DataActions>({
+        type: DataActionTypes.SET_AUTH_STATUS,
+        payload: userIsAnonymous
+    })
+};
 // Set Attendees
 export const setAttendees = (response: any) => (dispatch: Dispatch) => {
     dispatch<DataActions>({
@@ -45,17 +51,18 @@ export const setMomentTags = (response: any) => (dispatch: Dispatch) => {
     })
 };
 // Set setXCSRFtoken
-export const setXCSRFtoken = (response: any) => (dispatch: Dispatch) => {
+export const setXCSRFtoken = (response: string) => (dispatch: Dispatch) => {
     dispatch<DataActions>({
         type: DataActionTypes.SET_XCSRF_TOKEN,
         payload: response
     })
 };
 // Set Tags Parent Events IDs
-export const setTagParentEvents = (attendeeEventID: string, momentEventID: string) => (dispatch: Dispatch) => {
+export const setParentEventData = (eventID: string, attendeeEventID: string, momentEventID: string) => (dispatch: Dispatch) => {
     dispatch<DataActions>({
-        type: DataActionTypes.SET_TAG_PARENT_EVENTS,
+        type: DataActionTypes.SET_PARENT_EVENT_DATA,
         payload: {
+            eventID: eventID,
             attendeeEventID: attendeeEventID,
             momentEventID: momentEventID
         }

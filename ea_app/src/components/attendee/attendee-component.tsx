@@ -4,7 +4,7 @@ import {RootState} from "../../store/store";
 import {fetchPassword, fetchUsername, prodURL} from "../../shared/keys";
 import axios from "axios";
 
-import {AttendeeData, DataState} from "../../store/data/reducer";
+import {DataState} from "../../store/data/reducer";
 import {setAttendees, setEventTags} from "../../store/data/actions";
 import {callMethod, toggleDrawer} from "../../store/view/actions";
 
@@ -267,6 +267,42 @@ class AttendeeComponent extends PureComponent<Props, State> {
         });
     }
 
+    private createAttendeeNode = (title: string, firstName: string, lastName: string | undefined): void => {
+        axios({
+            method: 'post',
+            url: `${prodURL}/jsonapi/node/attendee`,
+            auth: {
+                username: `${fetchUsername}`,
+                password: `${fetchPassword}`
+            },
+            headers: {
+                'Accept': 'application/vnd.api+json',
+                'Content-Type': 'application/vnd.api+json',
+                'X-CSRF-Token': this.props.data.XCSRFtoken
+            },
+            data: {
+                "data": {
+                    "type": "node--attendee",
+                    "attributes": {
+                        "title": title,
+                        "field_first_name": firstName,
+                        "field_full_name": lastName ? `${firstName} ${lastName}` : firstName,
+                        "field_last_name": lastName,
+                    },
+                    "relationships": {
+                        "field_event_reference": {
+                            "data": {
+                                "type": "node--event",
+                                "id": this.props.data.parentEventData.eventID
+                            }
+                        }
+                    }
+                }
+            }
+        })
+            .catch(catchError);
+    };
+
     private createNewAttendee = (form: any, key: any): void => {
         this.setState({
             isLoading: true,
@@ -277,30 +313,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 return;
             }
             //this.registerUser(row.email, row.firstName, row.lastName);
-            axios({
-                method: 'post',
-                url: `${prodURL}/jsonapi/node/attendee`,
-                auth: {
-                    username: `${fetchUsername}`,
-                    password: `${fetchPassword}`
-                },
-                headers: {
-                    'Accept': 'application/vnd.api+json',
-                    'Content-Type': 'application/vnd.api+json'
-                },
-                data: {
-                    "data": {
-                        "type": "node--attendee",
-                        "attributes": {
-                            "title": row.email,
-                            "field_first_name": row.firstName,
-                            "field_full_name": row.lastName ? `${row.firstName} ${row.lastName}` : row.firstName,
-                            "field_last_name": row.lastName,
-                        }
-                    }
-                }
-            })
-                .catch(catchError);
+            this.createAttendeeNode(row.email, row.firstName, row.lastName)
         });
     };
 
@@ -343,31 +356,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 }
             })
             .then(res => {
-                axios({
-                    method: 'post',
-                    url: `${prodURL}/jsonapi/node/attendee`,
-                    auth: {
-                        username: `${fetchUsername}`,
-                        password: `${fetchPassword}`
-                    },
-                    headers: {
-                        'Accept': 'application/vnd.api+json',
-                        'Content-Type': 'application/vnd.api+json',
-                        'X-CSRF-Token': this.props.data.XCSRFtoken
-                    },
-                    data: {
-                        "data": {
-                            "type": "node--attendee",
-                            "attributes": {
-                                "title": enteredEmail,
-                                "field_first_name": firstName,
-                                "field_full_name": lastName ? `${firstName} ${lastName}` : firstName,
-                                "field_last_name": lastName,
-                            }
-                        }
-                    }
-                })
-                    .catch(catchError);
+                this.createAttendeeNode(enteredEmail, firstName, lastName)
             })
             .then(res => {
                 this.props.callMethod('fetchAttendees')
