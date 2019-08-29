@@ -215,7 +215,7 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
         let tagPosition = 0;
 
         const columns: ColumnProps<TableRow>[] = [{
-            title: 'Event tags',
+            title: 'Attendee tags',
             dataIndex: 'eventTags',
             key: 'eventTags',
             render: (tags, record, index) => {

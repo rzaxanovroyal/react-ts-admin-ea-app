@@ -8,12 +8,27 @@ import {DataState} from "../../store/data/reducer";
 import {setAttendees, setEventTags} from "../../store/data/actions";
 import {callMethod, toggleDrawer} from "../../store/view/actions";
 
-import {Button, Form, Icon, Input, InputNumber, Popconfirm, Spin, Table, Tag} from 'antd';
+import {Form, Icon, Input, InputNumber, Popconfirm, Spin, Table, Tag, Popover, message} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
 import DrawerTagsComponent from "./drawer-tags-component"
 import {ViewState} from "../../store/view/reducer";
 import {catchError} from "../../shared/common-methods";
+import LoaderComponent from "../loader-component";
+import styled from "styled-components";
 
+// CSS starts
+const LoaderWrapper = styled.div`
+ display: grid;
+ grid-template-columns: 1fr;
+ height: 70vh;
+ align-items: center;
+ justify-items: center;
+`;
+// CSS ends
+
+message.config({
+    top: 150
+});
 // @ts-ignore
 const EditableContext = React.createContext();
 // @ts-ignore
@@ -40,7 +55,7 @@ class EditableCell extends PureComponent<EditableCellProps, EditableCellState> {
         if (this.props.inputType === 'number') {
             return <InputNumber/>;
         }
-        return <Input/>;
+        return <Input placeholder={`Enter ${this.props.title}`}/>;
     };
 
     renderCell = ({getFieldDecorator}: any) => {
@@ -114,7 +129,7 @@ interface newAttendee {
 export interface Columns {
     dataIndex?: string;
     render?: (text: any, record: Attendee, index?: number | undefined) => any;
-    title: string;
+    title: any;
     key: string;
     editable?: boolean;
     sorter?: (a: any, b: any) => any;
@@ -126,6 +141,7 @@ type State = Readonly<{
     dataSource: Attendee[];
     editingRow: string;
     isLoading: boolean;
+    fullscreenLoading: boolean;
     createAttendeeMode: boolean;
 }>;
 
@@ -153,6 +169,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
             }],
             editingRow: '',
             isLoading: true,
+            fullscreenLoading: false,
             createAttendeeMode: false
         };
     }
@@ -221,7 +238,6 @@ class AttendeeComponent extends PureComponent<Props, State> {
             }
         })
             .then(res => {
-                console.log(res);
                 this.props.callMethod('fetchAttendees')
             })
             .catch(catchError);
@@ -300,20 +316,32 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 }
             }
         })
-            .catch(catchError);
+            .then(res => {
+                this.props.callMethod('fetchAttendees');
+                this.setState({
+                    createAttendeeMode: false,
+                    fullscreenLoading: false
+                });
+            })
+            .catch(error => {
+                this.props.callMethod('fetchAttendees');
+                this.setState({
+                    createAttendeeMode: false,
+                    fullscreenLoading: false
+                });
+            });
+    };
+
+    private emailIsAlreadyRegistered = (): void => {
+        message.error('Email is already registered');
     };
 
     private createNewAttendee = (form: any, key: any): void => {
-        this.setState({
-            isLoading: true,
-        });
-
         form.validateFields((error: any, row: any) => {
             if (error) {
                 return;
             }
-            //this.registerUser(row.email, row.firstName, row.lastName);
-            this.createAttendeeNode(row.email, row.firstName, row.lastName)
+            this.initiateRegister(row.email, row.firstName, row.lastName);
         });
     };
 
@@ -321,7 +349,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
         this.setState({editingRow: key});
     }
 
-    private registerUser = (enteredEmail: string, firstName: string, lastName: string): void => {
+    private initiateRegister = (enteredEmail: string, firstName: string, lastName: string): void => {
         const fetchURL = `${prodURL}/jsonapi/user/user?fields[user--user]=mail&filter[mail]=${enteredEmail}`;
         axios({
             method: 'get',
@@ -340,26 +368,30 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 const attendeeAlreadyRegistered = registeredAttendees.some((attendee: string) => attendee);
 
                 if (attendeeAlreadyRegistered === false) {
-                    axios({
-                        method: 'post',
-                        url: `${prodURL}/user/register?_format=json`,
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-Token': this.props.data.XCSRFtoken
-                        },
-                        data: {
-                            "name": {"value": enteredEmail},
-                            "mail": {"value": enteredEmail}
-                        }
-                    })
-                        .catch(catchError);
+                    this.setState({fullscreenLoading: true});
+                    this.registerUser(enteredEmail, firstName, lastName);
+                } else {
+                    this.emailIsAlreadyRegistered();
                 }
             })
+            .catch(catchError);
+    };
+
+    private registerUser = (enteredEmail: string, firstName: string, lastName: string): void => {
+        axios({
+            method: 'post',
+            url: `${prodURL}/user/register?_format=json`,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': this.props.data.XCSRFtoken
+            },
+            data: {
+                "name": {"value": enteredEmail},
+                "mail": {"value": enteredEmail}
+            }
+        })
             .then(res => {
                 this.createAttendeeNode(enteredEmail, firstName, lastName)
-            })
-            .then(res => {
-                this.props.callMethod('fetchAttendees')
             })
             .catch(catchError);
     };
@@ -413,11 +445,12 @@ class AttendeeComponent extends PureComponent<Props, State> {
         const {dataSource} = this.state;
         const newData = {
             key: -1,
-            firstName: '#Enter First name',
-            lastName: '#Enter Last name',
-            email: '#Enter e-mail',
+            firstName: '#ENTER FIRST NAME#',
+            lastName: '#ENTER LAST NAME#',
+            email: '#ENTER E-MAIL#',
             attendeeTags: []
         };
+
         this.setState({
             dataSource: [...dataSource, newData],
             createAttendeeMode: true
@@ -435,11 +468,24 @@ class AttendeeComponent extends PureComponent<Props, State> {
     }
 
     render() {
+        const {createAttendeeMode} = this.state;
+
         let tagPosition = 0;
 
         const columnsBlueprint: Columns[] = [
             {
-                title: 'Edit',
+                title: (text: any, record: any) => {
+                    if (createAttendeeMode) {
+                        return 'Edit'
+                    } else {
+                        return (
+                            <Popover content='Add attendee' placement="left">
+                                <Icon type="usergroup-add" theme="outlined" onClick={this.handleAdd}
+                                      style={{fontSize: '22px', color: 'rgba(176,31,95,1)'}}/>
+                            </Popover>
+                        )
+                    }
+                },
                 key: 'edit',
                 render: (text, record) => {
                     const {editingRow} = this.state;
@@ -460,8 +506,10 @@ class AttendeeComponent extends PureComponent<Props, State> {
             </span>)
                             :
                             (<a disabled={editingRow !== ''} onClick={() => this.edit(record.key)}>
-                                <Icon type="user-add" theme="outlined"
-                                      style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>
+                                <Popover content='Edit' placement="left">
+                                    <Icon type="user-add" theme="outlined"
+                                          style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>
+                                </Popover>
                             </a>);
                     }
                     return editable ?
@@ -478,8 +526,10 @@ class AttendeeComponent extends PureComponent<Props, State> {
             </span>)
                         :
                         (<a disabled={editingRow !== ''} onClick={() => this.edit(record.key)}>
-                            <Icon type="edit" theme="outlined"
-                                  style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>
+                            <Popover content='Edit' placement="left">
+                                <Icon type="edit" theme="outlined"
+                                      style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>
+                            </Popover>
                         </a>);
                 },
             },
@@ -512,7 +562,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 title: 'Email',
                 dataIndex: 'email',
                 key: 'email',
-                editable: this.state.createAttendeeMode,
+                editable: createAttendeeMode,
                 sorter: (a, b) => {
                     a = a.email || 'zzz';
                     b = b.email || 'zzz';
@@ -628,27 +678,27 @@ class AttendeeComponent extends PureComponent<Props, State> {
         });
 
         return (
-            <React.Fragment>
-                {!this.state.createAttendeeMode ?
-                    <Button onClick={this.handleAdd} type="dashed" style={{marginBottom: 16}}>
-                        <Icon type="plus" theme="outlined"
-                              style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>Add row
-                    </Button> : null}
-                <EditableContext.Provider value={this.props.form}>
-                    <Table<Attendee>
-                        components={components}
-                        bordered
-                        dataSource={this.state.dataSource}
-                        columns={columns}
-                        // @ts-ignore
-                        rowClassName="editable-row"
-                        pagination={{
-                            onChange: this.cancel,
-                        }}
-                    />
-                </EditableContext.Provider>
-                <DrawerTagsComponent/>
-            </React.Fragment>
+            this.state.fullscreenLoading ?
+                <LoaderWrapper>
+                    <LoaderComponent/>
+                </LoaderWrapper>
+                :
+                <React.Fragment>
+                    <EditableContext.Provider value={this.props.form}>
+                        <Table<Attendee>
+                            components={components}
+                            bordered
+                            dataSource={this.state.dataSource}
+                            columns={columns}
+                            // @ts-ignore
+                            rowClassName="editable-row"
+                            pagination={{
+                                onChange: this.cancel,
+                            }}
+                        />
+                    </EditableContext.Provider>
+                    <DrawerTagsComponent/>
+                </React.Fragment>
         );
     }
 }

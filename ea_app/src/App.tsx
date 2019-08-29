@@ -214,9 +214,9 @@ class App extends PureComponent<Props, State> {
         /*global drupalSettings:true*/
         /*eslint no-undef: "error"*/
         // @ts-ignore
-        await this.props.setAuthStatus(drupalSettings.isAnonymous);//true//drupalSettings.authStatus
+        await this.props.setAuthStatus(false);//false//drupalSettings.isAnonymous
         // @ts-ignore
-        await this.props.setEventCode(drupalSettings.eventAccessCode);//'039214'//drupalSettings.eventAccessCode//'332280'
+        await this.props.setEventCode('039214');//'039214'//drupalSettings.eventAccessCode//'332280'
         await this.fetchEventTags();
         await this.fetchAttendees();
         await this.fetchMomentTags();

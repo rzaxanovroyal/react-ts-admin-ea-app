@@ -79,13 +79,12 @@ class SidebarComponent extends PureComponent<Props, State> {
                 break;
             default:
                 currentComponent = <AttendeeComponent/>;
-
         }
         return (
             <Wrapper>
                 <SidebarWrapper>
                     <SidebarItem onClick={this.setComponent('Attendee')}
-                                 isActive={component === 'Attendee'}>ATTENDEE</SidebarItem>
+                                 isActive={component === 'Attendee'}>ATTENDEES</SidebarItem>
                     <SidebarItem onClick={this.setComponent('Attendee tags')}
                                  isActive={component === 'Attendee tags'}>ATTENDEE TAGS</SidebarItem>
                     <SidebarItem onClick={this.setComponent('Moment tags')}

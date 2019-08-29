@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3277053e-f289-41bc-85da-c6819d4f9bb8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/ea_app/src/components/loader-component.tsx" afterDir="false" />
+    <list default="true" id="3277053e-f289-41bc-85da-c6819d4f9bb8" name="Default Changelist" comment="Deployed RC1 to address Drupal issue on creating attendee nodes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea_app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ea_app/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/App.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ea_app/src/components/attendee-tags/attendee-tags-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/components/attendee-tags/attendee-tags-component.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ea_app/src/components/attendee/attendee-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/components/attendee/attendee-component.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/components/moment-tags/moment-tags-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/components/moment-tags/moment-tags-component.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/store/data/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/store/data/actions.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/store/data/reducer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/store/data/reducer.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ea_app/src/store/data/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/store/data/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ea_app/src/components/sidebar-component.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/src/components/sidebar-component.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ea_app/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/ea_app/yarn.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/event_admin.module" beforeDir="false" afterPath="$PROJECT_DIR$/event_admin.module" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -48,7 +43,7 @@
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="settings.saveactions" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
     <property name="ts.external.directory.path" value="C:\server\EventStory\event-admin\ea_app\node_modules\typescript\lib" />
   </component>
   <component name="RecentsManager">
@@ -93,7 +88,11 @@
       <workItem from="1566835596215" duration="13853000" />
       <workItem from="1566887626529" duration="5446000" />
       <workItem from="1566903505711" duration="17770000" />
-      <workItem from="1566976333825" duration="15163000" />
+      <workItem from="1566976333825" duration="24753000" />
+      <workItem from="1567064167490" duration="4596000" />
+      <workItem from="1567070610930" duration="754000" />
+      <workItem from="1567071393338" duration="3880000" />
+      <workItem from="1567079805959" duration="10013000" />
     </task>
     <task id="LOCAL-00001" summary="Add new event tags feature">
       <created>1566894160331</created>
@@ -116,7 +115,14 @@
       <option name="project" value="LOCAL" />
       <updated>1566926655238</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Deployed RC1 to address Drupal issue on creating attendee nodes">
+      <created>1566993031828</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1566993031828</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -139,6 +145,7 @@
     <MESSAGE value="Add new event tags feature" />
     <MESSAGE value="Finish attendee tag component and prevent from attendee data refetching" />
     <MESSAGE value="1. Rebuild parent data fetch methods to work with new empty nodes.&#10;2. Finish the moment tag component." />
-    <option name="LAST_COMMIT_MESSAGE" value="1. Rebuild parent data fetch methods to work with new empty nodes.&#10;2. Finish the moment tag component." />
+    <MESSAGE value="Deployed RC1 to address Drupal issue on creating attendee nodes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Deployed RC1 to address Drupal issue on creating attendee nodes" />
   </component>
 </project>
