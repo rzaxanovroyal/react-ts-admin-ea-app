@@ -381,7 +381,11 @@ class AttendeeComponent extends PureComponent<Props, State> {
     private registerUser = (enteredEmail: string, firstName: string, lastName: string): void => {
         axios({
             method: 'post',
-            url: `${prodURL}/user/register?_format=json`,
+            url: `${prodURL}/entity/user?_format=hal_json`,
+            auth: {
+                username: `${fetchUsername}`,
+                password: `${fetchPassword}`
+            },
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': this.props.data.XCSRFtoken

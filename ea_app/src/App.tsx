@@ -23,7 +23,7 @@ import SidebarComponent from "./components/sidebar-component";
 import {catchError} from "./shared/common-methods";
 import {ViewState} from "./store/view/reducer";
 import LoaderComponent from "./components/loader-component";
-import {LocaleProvider} from 'antd';
+import {ConfigProvider} from 'antd';
 import frFR from 'antd/lib/locale-provider/fr_FR';
 import enGB from 'antd/lib/locale-provider/en_GB';
 
@@ -298,9 +298,9 @@ class App extends PureComponent<Props, State> {
                 </LoaderWrapper>
                 :
                 !userIsAnonymous ?
-                    <LocaleProvider locale={AntdLocale}>
+                    <ConfigProvider locale={AntdLocale}>
                         <SidebarComponent/>
-                    </LocaleProvider>
+                    </ConfigProvider>
                     :
                     <h2>Please log in to proceed</h2>
         );
