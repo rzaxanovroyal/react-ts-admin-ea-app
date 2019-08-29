@@ -2,8 +2,10 @@ import React, {AriaAttributes, DOMAttributes, PureComponent, SyntheticEvent} fro
 import styled from "styled-components";
 
 import AttendeeComponent from './attendee/attendee-component';
-import AttendeeTagsComponent from './attendee-tags/attendee-tags-component';
-import MomentTagsComponent from './moment-tags/moment-tags-component';
+import AttendeeTagsComponent from './attendee-tags-component';
+import MomentTagsComponent from './moment-tags-component';
+import HeaderComponent from "./header-component";
+import intl from "react-intl-universal";
 
 //CSS starts
 const Wrapper = styled.div`
@@ -84,13 +86,15 @@ class SidebarComponent extends PureComponent<Props, State> {
             <Wrapper>
                 <SidebarWrapper>
                     <SidebarItem onClick={this.setComponent('Attendee')}
-                                 isActive={component === 'Attendee'}>ATTENDEES</SidebarItem>
+                                 isActive={component === 'Attendee'}>{intl.get('ATTENDEES')}</SidebarItem>
                     <SidebarItem onClick={this.setComponent('Attendee tags')}
-                                 isActive={component === 'Attendee tags'}>ATTENDEE TAGS</SidebarItem>
+                                 isActive={component === 'Attendee tags'}>{intl.get('ATTENDEE_TAGS')}</SidebarItem>
                     <SidebarItem onClick={this.setComponent('Moment tags')}
-                                 isActive={component === 'Moment tags'}>MOMENT TAGS</SidebarItem>
+                                 isActive={component === 'Moment tags'}>{intl.get('MOMENT_TAGS')}</SidebarItem>
                 </SidebarWrapper>
+                
                 <ComponentWrapper>
+                    <HeaderComponent/>
                     {currentComponent}
                 </ComponentWrapper>
             </Wrapper>

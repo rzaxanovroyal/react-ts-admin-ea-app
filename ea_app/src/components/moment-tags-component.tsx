@@ -1,35 +1,35 @@
 import React, {PureComponent} from 'react';
 import {connect} from 'react-redux';
-import {RootState} from "../../store/store";
+import {RootState} from "../store/store";
 import {Form, Icon, Input, Modal, Spin, Table, Tag} from "antd";
 import {ColumnProps} from 'antd/es/table';
 import {FormComponentProps} from 'antd/es/form';
 import styled from "styled-components";
 import axios from "axios";
-import {catchError} from "../../shared/common-methods";
+import {catchError} from "../shared/common-methods";
 
-import {EventTag} from "../attendee/attendee-component";
-import {DataState} from "../../store/data/reducer";
-import {fetchPassword, fetchUsername, prodURL} from "../../shared/keys";
-import {ViewState} from "../../store/view/reducer";
-import {callMethod} from "../../store/view/actions";
+import {EventTag} from "./attendee/attendee-component";
+import {DataState} from "../store/data/reducer";
+import {fetchPassword, fetchUsername, prodURL} from "../shared/keys";
+import {ViewState} from "../store/view/reducer";
+import {callMethod} from "../store/view/actions";
+import intl from "react-intl-universal";
 
 // CSS starts
 const Wrapper = styled.div`
- margin-top: 48px;
 `;
 
 // CSS ends
 
-interface EventTagFormProps extends FormComponentProps {
+interface MomentTagFormProps extends FormComponentProps {
     visible: boolean;
     onCancel: () => void;
     onCreate: () => void;
 }
 
-const FormInModal = Form.create<EventTagFormProps>({name: 'form_in_modal'})(
+const FormInModal = Form.create<MomentTagFormProps>({name: 'form_in_modal'})(
     // eslint-disable-next-line
-    class extends React.Component<EventTagFormProps, any> {
+    class extends React.Component<MomentTagFormProps, any> {
         render() {
             //@ts-ignore
             const {visible, onCancel, onCreate, form} = this.props;
@@ -44,8 +44,8 @@ const FormInModal = Form.create<EventTagFormProps>({name: 'form_in_modal'})(
                     <Form layout="vertical" hideRequiredMark={true}>
                         <Form.Item>
                             {getFieldDecorator('tag', {
-                                rules: [{required: true, message: 'Please enter the tag'}],
-                            })(<Input placeholder="Enter attendee tag"/>)}
+                                rules: [{required: true, message: intl.get('ENTER_TAG')}],
+                            })(<Input placeholder={intl.get('ENTER_TAG')}/>)}
                         </Form.Item>
                     </Form>
                 </Modal>
@@ -64,7 +64,7 @@ interface OwnProps {
 
 interface TableRow {
     key: number,
-    eventTags: EventTag[];
+    momentTags: EventTag[];
 }
 
 const mapStateToProps = ({data, view}: RootState): { data: DataState, view: ViewState } => ({data, view});
@@ -77,11 +77,11 @@ type State = Readonly<{
     dataSource: TableRow[];
 }>;
 
-class AttendeeTagsComponent extends PureComponent<Props, State> {
+class MomentTagsComponent extends PureComponent<Props, State> {
     readonly state: State = {
         dataSource: [{
             key: 0,
-            eventTags: [{
+            momentTags: [{
                 tagID: '',
                 tagName: ''
             }],
@@ -90,10 +90,10 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
         visible: false
     };
 
-    private setEventTags = (): void => {
-        const eventData = this.props.data.eventTags;
+    private setMomentTags = (): void => {
+        const momentData = this.props.data.momentTags;
 
-        const eventTags = eventData.map((tag: any) => {
+        const momentTags = momentData.map((tag: any) => {
             return {
                 tagName: tag.attributes.name,
                 tagID: tag.id
@@ -103,7 +103,7 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
         this.setState({
             dataSource: [{
                 key: 0,
-                eventTags: eventTags
+                momentTags: momentTags
             }],
             isLoading: false
         })
@@ -114,7 +114,7 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
         this.setState({isLoading: true});
         await axios({
             method: 'delete',
-            url: `${prodURL}/jsonapi/taxonomy_term/attendee_tags/${tagID}`,
+            url: `${prodURL}/jsonapi/taxonomy_term/moment_tags/${tagID}`,
             auth: {
                 username: `${fetchUsername}`,
                 password: `${fetchPassword}`
@@ -126,9 +126,7 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
             }
         })
             .catch(error => error);
-
-        await this.props.callMethod('fetchEventTags')
-
+        await this.props.callMethod('fetchMomentTags')
     };
 
     private openModalForm = (record: TableRow) => {
@@ -150,7 +148,7 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
 
             axios({
                 method: 'post',
-                url: `${prodURL}/jsonapi/taxonomy_term/attendee_tags`,
+                url: `${prodURL}/jsonapi/taxonomy_term/moment_tags`,
                 auth: {
                     username: `${fetchUsername}`,
                     password: `${fetchPassword}`
@@ -162,7 +160,7 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
                 },
                 data: {
                     "data": {
-                        "type": "taxonomy_term--attendee_tags",
+                        "type": "taxonomy_term--moment_tags",
                         "attributes": {
                             "name": values.tag,
                         },
@@ -170,14 +168,14 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
                             "vid": {
                                 "data": {
                                     "type": "taxonomy_vocabulary--taxonomy_vocabulary",
-                                    "id": this.props.data.tagTaxonomyVocabularies.attendeeVocabularyID
+                                    "id": this.props.data.tagTaxonomyVocabularies.momentVocabularyID
                                 }
                             },
                             "parent": {
                                 "data": [
                                     {
-                                        "type": "taxonomy_term--attendee_tags",
-                                        "id": this.props.data.parentEventData.attendeeEventID
+                                        "type": "taxonomy_term--moment_tags",
+                                        "id": this.props.data.parentEventData.momentEventID
                                     }
                                 ]
                             }
@@ -186,7 +184,7 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
                 }
             })
                 .then(res => {
-                    this.props.callMethod('fetchEventTags');
+                    this.props.callMethod('fetchMomentTags');
                 })
                 .catch(catchError);
 
@@ -201,13 +199,13 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
     };
 
     componentDidMount(): void {
-        this.setEventTags()
+        this.setMomentTags()
     }
 
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-        if (this.props.data.eventTags !== prevProps.data.eventTags) {
-            this.setEventTags()
+        if (this.props.data.momentTags !== prevProps.data.momentTags) {
+            this.setMomentTags()
         }
     }
 
@@ -215,9 +213,9 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
         let tagPosition = 0;
 
         const columns: ColumnProps<TableRow>[] = [{
-            title: 'Attendee tags',
-            dataIndex: 'eventTags',
-            key: 'eventTags',
+            title: intl.get('MOMENT_TAGS'),
+            dataIndex: 'momentTags',
+            key: 'momentTags',
             render: (tags, record, index) => {
                 return (
                     <span>
@@ -289,7 +287,7 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
                             e.preventDefault();
                             this.openModalForm(record)
                         }} style={{background: '#fff', borderStyle: 'dashed'}}>
-                            <Icon type="plus"/> Add Tag
+                            <Icon type="plus"/> {intl.get('ADD_TAG')}
                             </Tag>
                        </span>
                 )
@@ -311,4 +309,4 @@ class AttendeeTagsComponent extends PureComponent<Props, State> {
     }
 }
 
-export default connect(mapStateToProps, {callMethod})(AttendeeTagsComponent);
+export default connect(mapStateToProps, {callMethod})(MomentTagsComponent);

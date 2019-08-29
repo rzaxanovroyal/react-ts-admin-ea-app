@@ -1,6 +1,7 @@
 import React, {PureComponent} from 'react';
 import {connect} from 'react-redux';
 import styled from "styled-components";
+import intl from "react-intl-universal";
 
 import {RootState} from "./store/store";
 import {
@@ -8,6 +9,7 @@ import {
     setAuthStatus,
     setEventTags,
     setMomentTags,
+    setLanguage,
     setXCSRFtoken,
     setAttendees,
     setParentEventData,
@@ -21,6 +23,9 @@ import SidebarComponent from "./components/sidebar-component";
 import {catchError} from "./shared/common-methods";
 import {ViewState} from "./store/view/reducer";
 import LoaderComponent from "./components/loader-component";
+import {LocaleProvider} from 'antd';
+import frFR from 'antd/lib/locale-provider/fr_FR';
+import enGB from 'antd/lib/locale-provider/en_GB';
 
 // CSS starts
 const LoaderWrapper = styled.div`
@@ -33,10 +38,17 @@ const LoaderWrapper = styled.div`
 
 // CSS ends
 
+const locales = {
+    "en": require('./locales/en-US.json'),
+    "fr": require('./locales/fr-FR.json'),
+};
+
 interface OwnProps {
     setXCSRFtoken(XCSRFtoken: string): void;
 
     setEventCode(eventCode: string): void;
+
+    setLanguage(language: string): void;
 
     setAuthStatus(userIsAnonymous: boolean): void;
 
@@ -51,7 +63,6 @@ interface OwnProps {
     callMethod(method: string): void;
 
     setAttendees(attendees: AttendeeData): void;
-
 }
 
 const mapStateToProps = ({data, view}: RootState): { data: DataState, view: ViewState } => ({data, view});
@@ -59,12 +70,14 @@ const mapStateToProps = ({data, view}: RootState): { data: DataState, view: View
 type Props = OwnProps & ReturnType<typeof mapStateToProps>;
 
 type State = Readonly<{
-    isLoading: boolean
+    isLoading: boolean;
+    initDone: boolean;
 }>;
 
 class App extends PureComponent<Props, State> {
     readonly state: State = {
-        isLoading: true
+        isLoading: true,
+        initDone: false
     };
 
     private getXCSRFToken = (): void => {
@@ -209,19 +222,35 @@ class App extends PureComponent<Props, State> {
             .catch(catchError);
     };
 
+    loadLocales() {
+        // init method will load CLDR locale data according to currentLocale
+        // react-intl-universal is singleton, so you should init it only once in your app
+        intl.init({
+            currentLocale: this.props.data.language,
+            locales,
+        })
+            .then(() => {
+                // After loading CLDR locale data, start to render
+                this.setState({initDone: true});
+            });
+    }
+
     async componentDidMount() {
         this.getXCSRFToken();
         /*global drupalSettings:true*/
         /*eslint no-undef: "error"*/
         // @ts-ignore
-        await this.props.setAuthStatus(false);//false//drupalSettings.isAnonymous
+        await this.props.setAuthStatus(drupalSettings.isAnonymous);//false//drupalSettings.isAnonymous
         // @ts-ignore
-        await this.props.setEventCode('039214');//'039214'//drupalSettings.eventAccessCode//'332280'
+        await this.props.setEventCode(drupalSettings.eventAccessCode);//'039214'//drupalSettings.eventAccessCode//'332280'
+        // @ts-ignore
+        await this.props.setLanguage(drupalSettings.language);//drupalSettings.language//'en'
         await this.fetchEventTags();
         await this.fetchAttendees();
         await this.fetchMomentTags();
         await this.fetchTagsParentEvent();
         await this.fetchTaxonomyVocabularyID();
+        await this.loadLocales();//do not remove locally
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
@@ -245,14 +274,33 @@ class App extends PureComponent<Props, State> {
 
     render() {
         const {userIsAnonymous} = this.props.data;
+
+        const currentLocale = this.props.data.language;
+        let AntdLocale;
+        switch (currentLocale) {
+            case 'en': {
+                AntdLocale = enGB;
+                break;
+            }
+            case 'fr': {
+                AntdLocale = frFR;
+                break;
+            }
+            default: {
+                AntdLocale = enGB;
+                break;
+            }
+        }
         return (
-            this.state.isLoading ?
+            this.state.isLoading || !this.state.initDone ?
                 <LoaderWrapper>
                     <LoaderComponent/>
                 </LoaderWrapper>
                 :
                 !userIsAnonymous ?
-                    <SidebarComponent/>
+                    <LocaleProvider locale={AntdLocale}>
+                        <SidebarComponent/>
+                    </LocaleProvider>
                     :
                     <h2>Please log in to proceed</h2>
         );
@@ -263,6 +311,7 @@ export default connect(mapStateToProps, {
     setAttendees,
     setAuthStatus,
     setEventCode,
+    setLanguage,
     setXCSRFtoken,
     setEventTags,
     setMomentTags,

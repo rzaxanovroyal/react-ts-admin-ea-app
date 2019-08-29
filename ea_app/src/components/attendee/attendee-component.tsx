@@ -15,6 +15,7 @@ import {ViewState} from "../../store/view/reducer";
 import {catchError} from "../../shared/common-methods";
 import LoaderComponent from "../loader-component";
 import styled from "styled-components";
+import intl from "react-intl-universal";
 
 // CSS starts
 const LoaderWrapper = styled.div`
@@ -333,7 +334,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
     };
 
     private emailIsAlreadyRegistered = (): void => {
-        message.error('Email is already registered');
+        message.error(intl.get('EMAIL_IS_ALREADY_REGISTERED'));
     };
 
     private createNewAttendee = (form: any, key: any): void => {
@@ -445,9 +446,9 @@ class AttendeeComponent extends PureComponent<Props, State> {
         const {dataSource} = this.state;
         const newData = {
             key: -1,
-            firstName: '#ENTER FIRST NAME#',
-            lastName: '#ENTER LAST NAME#',
-            email: '#ENTER E-MAIL#',
+            firstName: intl.get('#ENTER_FIRST_NAME#'),
+            lastName: intl.get('#ENTER_LAST_NAME#'),
+            email: intl.get('#ENTER_E-MAIL#'),
             attendeeTags: []
         };
 
@@ -476,10 +477,10 @@ class AttendeeComponent extends PureComponent<Props, State> {
             {
                 title: (text: any, record: any) => {
                     if (createAttendeeMode) {
-                        return 'Edit'
+                        return intl.get('EDIT')
                     } else {
                         return (
-                            <Popover content='Add attendee' placement="left">
+                            <Popover content={intl.get('ADD_ATTENDEE')} placement="left">
                                 <Icon type="usergroup-add" theme="outlined" onClick={this.handleAdd}
                                       style={{fontSize: '22px', color: 'rgba(176,31,95,1)'}}/>
                             </Popover>
@@ -499,14 +500,15 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     <a
                         onClick={() => this.createNewAttendee(form, record.key)}
                         style={{marginRight: 8}}
-                    > Save </a>)}
+                    > {intl.get('SAVE')} </a>)}
               </EditableContext.Consumer>
 
-              <Popconfirm title="Sure to cancel?" onConfirm={() => this.cancel(record.key)}><a> Cancel </a></Popconfirm>
+              <Popconfirm title={intl.get('CANCEL?')}
+                          onConfirm={() => this.cancel(record.key)}><a> {intl.get('CANCEL')} </a></Popconfirm>
             </span>)
                             :
                             (<a disabled={editingRow !== ''} onClick={() => this.edit(record.key)}>
-                                <Popover content='Edit' placement="left">
+                                <Popover content={intl.get('EDIT')} placement="left">
                                     <Icon type="user-add" theme="outlined"
                                           style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>
                                 </Popover>
@@ -519,14 +521,15 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     <a
                         onClick={() => this.save(form, record.key)}
                         style={{marginRight: 8}}
-                    > Save </a>)}
+                    > {intl.get('SAVE')} </a>)}
               </EditableContext.Consumer>
 
-              <Popconfirm title="Sure to cancel?" onConfirm={() => this.cancel(record.key)}><a> Cancel </a></Popconfirm>
+              <Popconfirm title={intl.get('CANCEL?')}
+                          onConfirm={() => this.cancel(record.key)}><a> {intl.get('CANCEL')} </a></Popconfirm>
             </span>)
                         :
                         (<a disabled={editingRow !== ''} onClick={() => this.edit(record.key)}>
-                            <Popover content='Edit' placement="left">
+                            <Popover content={intl.get('EDIT')} placement="left">
                                 <Icon type="edit" theme="outlined"
                                       style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>
                             </Popover>
@@ -534,7 +537,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 },
             },
             {
-                title: 'First name',
+                title: intl.get('FIRST_NAME'),
                 dataIndex: 'firstName',
                 key: 'firstName',
                 editable: true,
@@ -546,7 +549,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 sortDirections: ['ascend', 'descend']
             },
             {
-                title: 'Last name',
+                title: intl.get('LAST_NAME'),
                 dataIndex: 'lastName',
                 key: 'lastName',
                 editable: true,
@@ -559,7 +562,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 sortDirections: ['ascend', 'descend']
             },
             {
-                title: 'Email',
+                title: intl.get('EMAIL'),
                 dataIndex: 'email',
                 key: 'email',
                 editable: createAttendeeMode,
@@ -570,14 +573,14 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 },
                 sortDirections: ['ascend', 'descend']
             }, {
-                title: 'Attendee tags',
+                title: intl.get('ATTENDEE_TAGS'),
                 dataIndex: 'attendeeTags',
                 key: 'attendeeTags',
                 editable: false,
                 render: (tags, record, index) => {
                     if (record.key === -1) {
                         return (
-                            <div>Please create new attendee before adding tags</div>
+                            <div>{intl.get('CREATE_NEW_ATTENDEE_BEFORE_TAGS')}</div>
                         )
                     }
                     return (
@@ -647,7 +650,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                                 e.preventDefault();
                                 this.addTag(record)
                             }} style={{background: '#fff', borderStyle: 'dashed'}}>
-                            <Icon type="plus"/> Add Tag
+                            <Icon type="plus"/> {intl.get('ADD_TAG')}
                             </Tag>
                        </span>
                     )

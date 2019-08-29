@@ -12,6 +12,7 @@ import {ViewState} from "../../store/view/reducer";
 import {callMethod, toggleDrawer} from "../../store/view/actions";
 import {EventTag} from "./attendee-component";
 import {catchError} from "../../shared/common-methods";
+import intl from "react-intl-universal";
 
 // CSS starts
 const DrawerButtonContainer = styled.div`
@@ -168,11 +169,12 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
 
         return (
             <Drawer
-                title={`Choose tags to add (${allowedTagsPerAttendee} max)`}
+                title={`${intl.get('CHOOSE_TAGS')} (${allowedTagsPerAttendee} max)`}
                 placement="right"
                 closable={false}
                 onClose={this.closeDrawer}
                 visible={this.props.view.DrawerIsVisible.drawerStatus}
+                width={300}
             >
                 {eventTags.map((eventTag: any, index: number) => (
                     <CheckableTag
@@ -186,10 +188,11 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
 
                 <DrawerButtonContainer>
                     <Button loading={this.state.isLoading} style={{marginRight: 8}}
-                            onClick={this.closeDrawer}>Cancel</Button>
+                            onClick={this.closeDrawer}>{intl.get('CANCEL')}</Button>
 
                     {this.state.selectedTags.length ?
-                        <Button loading={this.state.isLoading} onClick={this.saveTags} type="primary">Submit</Button>
+                        <Button loading={this.state.isLoading} onClick={this.saveTags}
+                                type="primary">{intl.get('SAVE')}</Button>
                         : null}
                 </DrawerButtonContainer>
             </Drawer>
