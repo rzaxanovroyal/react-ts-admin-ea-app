@@ -1,4 +1,4 @@
-import React, {AriaAttributes, DOMAttributes, PureComponent} from 'react';
+import React, {AriaAttributes, DOMAttributes, PureComponent, createRef} from 'react';
 import {connect} from 'react-redux';
 import {RootState} from "../../store/store";
 import {fetchPassword, fetchUsername, prodURL} from "../../shared/keys";
@@ -155,8 +155,13 @@ declare module 'react' {
 const spinIcon = <Icon type="loading" style={{fontSize: 6, marginLeft: 7, marginRight: 5, verticalAlign: 3}} spin/>;
 
 class AttendeeComponent extends PureComponent<Props, State> {
+    readonly myRef: React.RefObject<HTMLDivElement>;
+
     constructor(props: Props) {
         super(props);
+
+        this.myRef = createRef<HTMLDivElement>();
+
         this.state = {
             dataSource: [{
                 key: 0,
@@ -446,7 +451,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
         })
     };
 
-    private handleAdd = (): void => {
+    private handleAdd = async () => {
         const {dataSource} = this.state;
         const newData = {
             key: -1,
@@ -456,10 +461,12 @@ class AttendeeComponent extends PureComponent<Props, State> {
             attendeeTags: []
         };
 
-        this.setState({
+        await this.setState({
             dataSource: [...dataSource, newData],
             createAttendeeMode: true
         });
+
+        await this.myRef.current!.click();
     };
 
     componentDidMount(): void {
@@ -511,12 +518,14 @@ class AttendeeComponent extends PureComponent<Props, State> {
                           onConfirm={() => this.cancel(record.key)}><a> {intl.get('CANCEL')} </a></Popconfirm>
             </span>)
                             :
-                            (<a disabled={editingRow !== ''} onClick={() => this.edit(record.key)}>
+                            (<div disabled={editingRow !== ''}
+                                  ref={this.myRef}
+                                  onClick={() => this.edit(record.key)}>
                                 <Popover content={intl.get('EDIT')} placement="left">
                                     <Icon type="user-add" theme="outlined"
                                           style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>
                                 </Popover>
-                            </a>);
+                            </div>);
                     }
                     return editable ?
                         (<span>
@@ -532,12 +541,12 @@ class AttendeeComponent extends PureComponent<Props, State> {
                           onConfirm={() => this.cancel(record.key)}><a> {intl.get('CANCEL')} </a></Popconfirm>
             </span>)
                         :
-                        (<a disabled={editingRow !== ''} onClick={() => this.edit(record.key)}>
+                        (<div disabled={editingRow !== ''} onClick={() => this.edit(record.key)}>
                             <Popover content={intl.get('EDIT')} placement="left">
                                 <Icon type="edit" theme="outlined"
                                       style={{fontSize: '18px', color: 'rgba(176,31,95,1)'}}/>
                             </Popover>
-                        </a>);
+                        </div>);
                 },
             },
             {
