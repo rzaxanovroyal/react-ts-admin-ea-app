@@ -56,7 +56,7 @@ class EditableCell extends PureComponent<EditableCellProps, EditableCellState> {
         if (this.props.inputType === 'number') {
             return <InputNumber/>;
         }
-        return <Input placeholder={`Enter ${this.props.title}`}/>;
+        return <Input placeholder={`${intl.get('ENTER')} ${this.props.title}`}/>;
     };
 
     renderCell = ({getFieldDecorator}: any) => {
@@ -78,7 +78,7 @@ class EditableCell extends PureComponent<EditableCellProps, EditableCellState> {
                             rules: [
                                 {
                                     required: dataIndex === 'firstName' || dataIndex === 'email',
-                                    message: `Please enter ${title}`,
+                                    message: `${intl.get('PLEASE_ENTER')} ${title}`,
                                     type: dataIndex === 'email' ? 'email' : 'string'
                                 },
                             ],
@@ -289,7 +289,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
         });
     }
 
-    private createAttendeeNode = (title: string, firstName: string, lastName: string | undefined): void => {
+    private createAttendeeNode = (title: string, firstName: string, lastName: string | undefined, userID: string): void => {
         axios({
             method: 'post',
             url: `${prodURL}/jsonapi/node/attendee`,
@@ -312,6 +312,12 @@ class AttendeeComponent extends PureComponent<Props, State> {
                         "field_last_name": lastName,
                     },
                     "relationships": {
+                        "uid": {
+                            "data": {
+                                "type": "user--user",
+                                "id": userID
+                            }
+                        },
                         "field_event_reference": {
                             "data": {
                                 "type": "node--event",
@@ -401,7 +407,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
             }
         })
             .then(res => {
-                this.createAttendeeNode(enteredEmail, firstName, lastName)
+                const userID = res.data.uuid[0].value;
+                this.createAttendeeNode(enteredEmail, firstName, lastName, userID)
             })
             .catch(catchError);
     };

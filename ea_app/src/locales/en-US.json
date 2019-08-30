@@ -12,6 +12,8 @@
   "#ENTER_LAST_NAME#": "#ENTER LAST NAME#",
   "#ENTER_E-MAIL#": "#ENTER E-MAIL#",
   "ENTER_TAG": "Please enter the tag",
+  "ENTER": "Enter",
+  "PLEASE_ENTER": "Please enter",
   "CREATE_NEW_ATTENDEE_BEFORE_TAGS": "Please create new attendee before adding tags",
   "CHOOSE_TAGS": "Choose tags to add",
   "LOG_IN_TO_PROCEED": "Please log in to proceed",

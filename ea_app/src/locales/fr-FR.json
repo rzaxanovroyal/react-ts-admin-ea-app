@@ -12,6 +12,8 @@
   "#ENTER_LAST_NAME#": "#SAISIR LE NOM#",
   "#ENTER_E-MAIL#": "#SAISIR L'EMAIL#",
   "ENTER_TAG": "Veuillez saisir un tag",
+  "ENTER": "Saisir",
+  "PLEASE_ENTER": "Veuillez saisir",
   "CREATE_NEW_ATTENDEE_BEFORE_TAGS": "Attention : créez un participant avant d'ajouter des tags",
   "CHOOSE_TAGS": "Sélectionnez un tag",
   "LOG_IN_TO_PROCEED": "Veuillez vous connecter avant de poursuivre",
