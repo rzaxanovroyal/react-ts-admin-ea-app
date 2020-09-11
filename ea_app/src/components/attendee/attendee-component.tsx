@@ -8,14 +8,24 @@ import {DataState} from "../../store/data/reducer";
 import {setAttendees, setEventTags} from "../../store/data/actions";
 import {callMethod, toggleDrawer} from "../../store/view/actions";
 
-import {Form, Icon, Input, InputNumber, Popconfirm, Spin, Table, Tag, Popover, message} from 'antd';
-import {FormComponentProps} from 'antd/lib/form';
+import {
+    Form, Input, InputNumber, Popconfirm, Spin, 
+    Table, Tag, Popover, message, Icon, Select
+} from 'antd';
+import {FormComponentProps} from 'antd/es/form';
 import DrawerTagsComponent from "./drawer-tags-component"
 import {ViewState} from "../../store/view/reducer";
 import {catchError} from "../../shared/common-methods";
 import LoaderComponent from "../loader-component";
 import styled from "styled-components";
 import intl from "react-intl-universal";
+
+import SearchBar from "material-ui-search-bar";
+import { filter } from 'lodash';
+
+import EditableFormTable from './expandable-editable-table';
+
+const { Option } = Select;
 
 // CSS starts
 const LoaderWrapper = styled.div`
@@ -117,14 +127,22 @@ export interface Attendee {
     key: number;
     firstName: string;
     lastName?: string;
+    gender: string;
     email: string;
-    attendeeTags: EventTag[]
+    birth: string;
+    death: string;
+    attendeeTags: EventTag[];
+    parent: any[];
+    createParentMode: boolean;
 }
 
 interface newAttendee {
     field_first_name: string;
     field_last_name?: string;
     field_full_name: string;
+    gender?: string;
+    birth?: string;
+    death?: string;
 }
 
 export interface Columns {
@@ -136,6 +154,9 @@ export interface Columns {
     sorter?: (a: any, b: any) => any;
     sortDirections?: any;
     defaultSortOrder?: "ascend" | "descend" | undefined;
+    filters?: any[];
+    width?: number;
+    fixed?: any;
 }
 
 type State = Readonly<{
@@ -144,6 +165,9 @@ type State = Readonly<{
     isLoading: boolean;
     fullscreenLoading: boolean;
     createAttendeeMode: boolean;
+    originDataSource: any[];
+    pagination: any;
+    searchValue: string;
 }>;
 
 declare module 'react' {
@@ -168,26 +192,36 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 firstName: '',
                 lastName: '',
                 email: '',
+                gender: '',
+                birth: '',
+                death: '',
                 attendeeTags: [{
                     tagID: '',
                     tagName: ''
                 }],
+                parent: [],
+                createParentMode: false
             }],
             editingRow: '',
             isLoading: true,
             fullscreenLoading: false,
-            createAttendeeMode: false
+            createAttendeeMode: false,
+            originDataSource: [],
+            pagination: {
+                current: 1,
+                pageSize: 10,
+            },
+            searchValue: ''
         };
     }
 
-    private removeTag = (record: Attendee, tagID: string) => {
+    private removeTag = (record: Attendee, tagID: string) => {        
         this.setState({isLoading: true});
-
         const attendeeID = record.attendeeTags[0].attendeeID;
         const attendeeIndex = record.key;
         const currentTags = this.props.data.attendees.data[attendeeIndex].relationships.field_attendee_tags.data;
         const updatedTags = currentTags.filter(currentTag => currentTag.id !== tagID);
-
+        console.log("removeTag", attendeeID, updatedTags);
         axios({
             method: 'patch',
             url: `${prodURL}/jsonapi/node/attendee/${attendeeID}`,
@@ -223,6 +257,15 @@ class AttendeeComponent extends PureComponent<Props, State> {
     };
 
     private updateAttendees = (attendeeID: string, newAttendee: newAttendee): void => {
+        // console.log("save here", attendeeID, newAttendee)
+        let modifiedNewAttendee:any = {
+            "field_first_name": newAttendee.field_first_name,
+            "field_full_name": newAttendee.field_full_name,
+            "field_last_name": newAttendee.field_last_name,
+            "field_gender": newAttendee.gender,
+            "field_birth": newAttendee.birth,
+            "field_death": newAttendee.death
+        }
         axios({
             method: 'patch',
             url: `${prodURL}/jsonapi/node/attendee/${attendeeID}`,
@@ -239,7 +282,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 "data": {
                     "type": "node--attendee",
                     "id": attendeeID,
-                    "attributes": newAttendee
+                    "attributes": modifiedNewAttendee
                 }
             }
         })
@@ -256,16 +299,18 @@ class AttendeeComponent extends PureComponent<Props, State> {
     };
 
     save(form: any, key: any) {
+        
         this.setState({isLoading: true});
 
         form.validateFields((error: any, row: any) => {
+            
             if (error) {
                 return;
             }
             const newData = [...this.state.dataSource];
             const index = newData.findIndex(item => key === item.key);
             const attendeeID = this.props.data.attendees.data[key].id;
-
+            
             if (index > -1) {
                 const item = newData[index];
                 newData.splice(index, 1, {
@@ -273,14 +318,17 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     ...row,
                 });
                 this.setState({dataSource: newData, editingRow: ''});
-
-                const updatedAttendee = newData[key];
+                console.log("save", newData, key, index);
+                const updatedAttendee = newData[index];
                 const newAttendee: newAttendee = {
                     field_first_name: updatedAttendee.firstName,
                     field_last_name: updatedAttendee.lastName,
+                    gender: updatedAttendee.gender,
+                    birth: updatedAttendee.birth,
+                    death: updatedAttendee.death,
                     field_full_name: updatedAttendee.lastName ? `${updatedAttendee.firstName} ${updatedAttendee.lastName}` : updatedAttendee.firstName
                 };
-
+                
                 this.updateAttendees(attendeeID, newAttendee);
             } else {
                 newData.push(row);
@@ -289,7 +337,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
         });
     }
 
-    private createAttendeeNode = (title: string, firstName: string, lastName: string | undefined, userID: string): void => {
+    private createAttendeeNode = (title: string, firstName: string, lastName: string | undefined, userID: string, gender: string, birth: string, death: string): void => {
+        console.log("createAttendeeNode");
         axios({
             method: 'post',
             url: `${prodURL}/jsonapi/node/attendee`,
@@ -310,6 +359,9 @@ class AttendeeComponent extends PureComponent<Props, State> {
                         "field_first_name": firstName,
                         "field_full_name": lastName ? `${firstName} ${lastName}` : firstName,
                         "field_last_name": lastName,
+                        "field_gender": gender,
+                        "field_birth": birth,
+                        "field_death": death
                     },
                     "relationships": {
                         "uid": {
@@ -353,7 +405,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
             if (error) {
                 return;
             }
-            this.initiateRegister(row.email, row.firstName, row.lastName);
+            this.initiateRegister(row.email, row.firstName, row.lastName, row.gender, row.birth, row.death);
         });
     };
 
@@ -361,7 +413,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
         this.setState({editingRow: key});
     }
 
-    private initiateRegister = (enteredEmail: string, firstName: string, lastName: string): void => {
+    private initiateRegister = (enteredEmail: string, firstName: string, lastName: string, gender: string, birth: string, death: string): void => {
         const fetchURL = `${prodURL}/jsonapi/user/user?fields[user--user]=mail&filter[mail]=${enteredEmail}`;
         axios({
             method: 'get',
@@ -381,7 +433,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
 
                 if (attendeeAlreadyRegistered === false) {
                     this.setState({fullscreenLoading: true});
-                    this.registerUser(enteredEmail, firstName, lastName);
+                    this.registerUser(enteredEmail, firstName, lastName, gender, birth, death);
                 } else {
                     this.emailIsAlreadyRegistered();
                 }
@@ -389,7 +441,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
             .catch(catchError);
     };
 
-    private registerUser = (enteredEmail: string, firstName: string, lastName: string): void => {
+    private registerUser = (enteredEmail: string, firstName: string, lastName: string, gender: string, birth: string, death: string): void => {
         axios({
             method: 'post',
             url: `${prodURL}/entity/user?_format=hal_json`,
@@ -408,7 +460,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
         })
             .then(res => {
                 const userID = res.data.uuid[0].value;
-                this.createAttendeeNode(enteredEmail, firstName, lastName, userID)
+                this.createAttendeeNode(enteredEmail, firstName, lastName, userID, gender, birth, death)
             })
             .catch(catchError);
     };
@@ -449,12 +501,18 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 firstName: attendeeName.attributes.field_first_name,
                 lastName: attendeeName.attributes.field_last_name,
                 email: attendeeName.attributes.title,
-                attendeeTags: tags
+                gender: attendeeName.attributes.gender,
+                birth: attendeeName.attributes.birth,
+                death: attendeeName.attributes.death,
+                attendeeTags: tags,
+                parent: attendeeName.attributes.parent,
+                createParentMode: false,
             }
         });
         this.setState({
             dataSource: attendeeData,
-            isLoading: false
+            isLoading: false,
+            originDataSource: attendeeData
         })
     };
 
@@ -465,7 +523,12 @@ class AttendeeComponent extends PureComponent<Props, State> {
             firstName: intl.get('#ENTER_FIRST_NAME#'),
             lastName: intl.get('#ENTER_LAST_NAME#'),
             email: intl.get('#ENTER_E-MAIL#'),
-            attendeeTags: []
+            gender: intl.get('#ENTER_GENDER#'),
+            birth: intl.get('#ENTER_BIRTH#'),
+            death: intl.get('#DEATH#'),
+            attendeeTags: [],
+            parent: [],
+            createParentMode: false
         };
 
         await this.setState({
@@ -478,12 +541,89 @@ class AttendeeComponent extends PureComponent<Props, State> {
 
     componentDidMount(): void {
         this.setDataSource();
+        const elements = document.getElementsByClassName("ant-table-hide-scrollbar");
+        const element = elements[0] as HTMLElement;
+        element.style.overflow = "hidden";
+        element.style.marginBottom = "0px";
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot ?: any): void {
         if (this.props.data.attendees !== prevProps.data.attendees) {
             this.setDataSource();
         }
+    }    
+
+    handleTableChange = (pagination:any, filters:any, sorter:any) => {
+        // console.log("pagination", pagination);
+        // console.log("sorter", sorter);
+        // console.log("filters", filters, this.state.originDataSource);
+        // console.log("handleTableChange", this.state.originDataSource);
+        let data:any[] = this.state.originDataSource, newData:any[] = [];
+        if(filters.gender && filters.gender.length) {            
+            for (let i = 0; i < filters.gender.length; i++) {
+                for(let j = 0; j < data.length; j++) {
+                    if (data[j].gender === filters.gender[i]) {
+                        newData.push(data[j]);
+                    }
+                }
+            }            
+        } else if(this.state.searchValue) {
+            let value:string = this.state.searchValue;
+            for(let i = 0; i < data.length; i++) {
+                if (data[i].firstName && data[i].firstName.indexOf(value) !== -1) {
+                    newData.push(data[i]);
+                } 
+                else if (data[i].lastName && data[i].lastName.indexOf(value) !== -1) {
+                    newData.push(data[i]);
+                } 
+                else if (data[i].email && data[i].email.indexOf(value) !== -1) {
+                    newData.push(data[i]);
+                }
+                else {
+                    continue;
+                }
+            }
+        } else {
+            newData = data;
+        }
+        this.setState({
+            dataSource: newData,
+            pagination: {
+                current: pagination.current,
+                pageSize: pagination.pageSize
+            }
+        });
+    };
+
+    handleChange = (value:any) => {
+        this.setState({
+            pagination: {
+                current: 1,
+                pageSize: parseInt(value)
+            }
+        });
+    }
+
+    onChangeSearch = (value:any) => {
+        let data:any[] = this.state.originDataSource, newData:any[] = [];
+        for(let i = 0; i < data.length; i++) {
+            if (data[i].firstName && data[i].firstName.indexOf(value) !== -1) {
+                newData.push(data[i]);
+            } 
+            else if (data[i].lastName && data[i].lastName.indexOf(value) !== -1) {
+                newData.push(data[i]);
+            } 
+            else if (data[i].email && data[i].email.indexOf(value) !== -1) {
+                newData.push(data[i]);
+            }
+            else {
+                continue;
+            }
+        }
+        this.setState({
+            dataSource: newData,
+            searchValue: value
+        });
     }
 
     render() {
@@ -513,17 +653,17 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     if (record.key === -1) {
                         return editable ?
                             (<span>
-              <EditableContext.Consumer>
-                {(form: any) => (
-                    <a
-                        onClick={() => this.createNewAttendee(form, record.key)}
-                        style={{marginRight: 8}}
-                    > {intl.get('SAVE')} </a>)}
-              </EditableContext.Consumer>
+                                <EditableContext.Consumer>
+                                    {(form: any) => (
+                                        <a
+                                            onClick={() => this.createNewAttendee(form, record.key)}
+                                            style={{marginRight: 8}}
+                                        > {intl.get('SAVE')} </a>)}
+                                </EditableContext.Consumer>
 
-              <Popconfirm title={intl.get('CANCEL?')}
-                          onConfirm={() => this.cancel(record.key)}><a> {intl.get('CANCEL')} </a></Popconfirm>
-            </span>)
+                                <Popconfirm title={intl.get('CANCEL?')}
+                                            onConfirm={() => this.cancel(record.key)}><a> {intl.get('CANCEL')} </a></Popconfirm>
+                            </span>)
                             :
                             (<div disabled={editingRow !== ''}
                                   ref={this.myRef}
@@ -536,17 +676,17 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     }
                     return editable ?
                         (<span>
-              <EditableContext.Consumer>
-                {(form: any) => (
-                    <a
-                        onClick={() => this.save(form, record.key)}
-                        style={{marginRight: 8}}
-                    > {intl.get('SAVE')} </a>)}
-              </EditableContext.Consumer>
+                            <EditableContext.Consumer>
+                                {(form: any) => (
+                                    <a
+                                        onClick={() => this.save(form, record.key)}
+                                        style={{marginRight: 8}}
+                                    > {intl.get('SAVE')} </a>)}
+                            </EditableContext.Consumer>
 
-              <Popconfirm title={intl.get('CANCEL?')}
-                          onConfirm={() => this.cancel(record.key)}><a> {intl.get('CANCEL')} </a></Popconfirm>
-            </span>)
+                            <Popconfirm title={intl.get('CANCEL?')}
+                                        onConfirm={() => this.cancel(record.key)}><a> {intl.get('CANCEL')} </a></Popconfirm>
+                        </span>)
                         :
                         (<div disabled={editingRow !== ''} onClick={() => this.edit(record.key)}>
                             <Popover content={intl.get('EDIT')} placement="left">
@@ -566,7 +706,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     b = b.firstName || 'zzz';
                     return a.localeCompare(b);
                 },
-                sortDirections: ['ascend', 'descend']
+                sortDirections: ['ascend', 'descend'],
             },
             {
                 title: intl.get('LAST_NAME'),
@@ -579,7 +719,43 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     b = b.lastName || 'zzz';
                     return a.localeCompare(b);
                 },
-                sortDirections: ['ascend', 'descend']
+                sortDirections: ['ascend', 'descend'],
+            },
+            {
+                title: intl.get('GENDER'),
+                dataIndex: 'gender',
+                key: 'gender',
+                editable: true,
+                filters: [
+                    { text: 'Male', value: 'M' },
+                    { text: 'Female', value: 'F' },
+                ],
+            },
+            {
+                title: intl.get('BIRTH'),
+                dataIndex: 'birth',
+                key: 'birth',
+                editable: true,
+                defaultSortOrder: 'ascend',
+                sorter: (a, b) => {
+                    a = a.lastName || 'zzz';
+                    b = b.lastName || 'zzz';
+                    return a.localeCompare(b);
+                },
+                sortDirections: ['ascend', 'descend'],
+            },
+            {
+                title: intl.get('DEATH'),
+                dataIndex: 'death',
+                key: 'death',
+                editable: true,
+                defaultSortOrder: 'ascend',
+                sorter: (a, b) => {
+                    a = a.lastName || 'zzz';
+                    b = b.lastName || 'zzz';
+                    return a.localeCompare(b);
+                },
+                sortDirections: ['ascend', 'descend'],
             },
             {
                 title: intl.get('EMAIL'),
@@ -591,8 +767,9 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     b = b.email || 'zzz';
                     return a.localeCompare(b);
                 },
-                sortDirections: ['ascend', 'descend']
-            }, {
+                sortDirections: ['ascend', 'descend'],
+            }, 
+            {
                 title: intl.get('ATTENDEE_TAGS'),
                 dataIndex: 'attendeeTags',
                 key: 'attendeeTags',
@@ -699,6 +876,13 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 }),
             };
         });
+        
+        const expandedRowRender = (dataSource:any) => {            
+            console.log("expandedRowRender", dataSource);
+            return (
+                <EditableFormTable propsData={dataSource} />
+            );
+        };
 
         return (
             this.state.fullscreenLoading ?
@@ -708,6 +892,13 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 :
                 <React.Fragment>
                     <EditableContext.Provider value={this.props.form}>
+                        <div style={{width: "25%", marginLeft: "74%", marginTop: "-35px", marginBottom: "10px"}}>
+                            <SearchBar
+                                value={this.state.searchValue}
+                                onChange={(newValue) => this.onChangeSearch(newValue)}
+                                onCancelSearch={() => this.setState({searchValue: '', dataSource: this.state.originDataSource})}
+                            />
+                        </div>
                         <Table<Attendee>
                             components={components}
                             bordered
@@ -715,10 +906,23 @@ class AttendeeComponent extends PureComponent<Props, State> {
                             columns={columns}
                             // @ts-ignore
                             rowClassName="editable-row"
-                            pagination={{
-                                onChange: this.cancel,
-                            }}
+                            // pagination={{
+                            //     onChange: this.cancel,
+                            // }}
+                            pagination={this.state.pagination}
+                            onChange={this.handleTableChange}
+                            expandedRowRender={expandedRowRender}
+                            scroll={{ y: 600 }}
+                            id="parent-table"
                         />
+                        <div style={{textAlign: "right", marginTop: "-47px"}}>
+                            <Select defaultValue="10" style={{ width: 120 }} onChange={this.handleChange}>
+                                <Option value="10">10 / page</Option>
+                                <Option value="20">20 / page</Option>
+                                <Option value="50">50 / page</Option>
+                                <Option value="100">100 / page</Option>
+                            </Select>
+                        </div>
                     </EditableContext.Provider>
                     <DrawerTagsComponent/>
                 </React.Fragment>
