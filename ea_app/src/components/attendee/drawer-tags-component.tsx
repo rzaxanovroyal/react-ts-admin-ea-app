@@ -132,6 +132,7 @@ class DrawerTagsComponent extends PureComponent<Props, State> {
                     isLoading: false
                 });
                 setTimeout(this.clearAllowedTagsPerAttendee, 500);
+                window.location.reload();
             })
             .catch(catchError);
     };

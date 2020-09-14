@@ -256,9 +256,9 @@ class App extends PureComponent<Props, State> {
         // @ts-ignore
         await this.props.setAuthStatus(false);//false//drupalSettings.isAnonymous
         // @ts-ignore
-        await this.props.setEventCode("390822");//'039214'//drupalSettings.eventAccessCode//'332280'
+        await this.props.setEventCode('390822');//'039214'//drupalSettings.eventAccessCode//'390822'
         // @ts-ignore
-        await this.props.setLanguage("en");//drupalSettings.language//'en'
+        await this.props.setLanguage('en');//drupalSettings.language//'en'
         await this.fetchEventTags();
         await this.fetchAttendees();
         await this.fetchMomentTags();
@@ -343,6 +343,7 @@ class App extends PureComponent<Props, State> {
                                 "birth": JSON.parse(data.data[v].relationships[0]).birth,
                                 "death": JSON.parse(data.data[v].relationships[0]).death,
                                 "email": JSON.parse(data.data[v].relationships[0]).email,
+                                "id": parentId,
                             }
                             parents.push(parentItem);
                             break;

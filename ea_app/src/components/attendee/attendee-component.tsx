@@ -246,8 +246,12 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 }
             }
         })
-            .then(res => {
-                this.props.callMethod('fetchAttendees')
+            .then((res:any) => {
+                this.props.callMethod('fetchAttendees');
+                if(res.status === 200) {
+                    console.log("removeTags-refresh");
+                    window.location.reload();
+                }
             })
             .catch(catchError);
     };
@@ -287,7 +291,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
             }
         })
             .then(res => {
-                this.props.callMethod('fetchAttendees')
+                this.props.callMethod('fetchAttendees');
+                // window.location.reload();
             })
             .catch(catchError);
     };
@@ -330,6 +335,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 };
                 
                 this.updateAttendees(attendeeID, newAttendee);
+                
             } else {
                 newData.push(row);
                 this.setState({dataSource: newData, editingRow: ''});
@@ -386,6 +392,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     createAttendeeMode: false,
                     fullscreenLoading: false
                 });
+                console.log("res", res);
+                // window.location.reload();
             })
             .catch(error => {
                 this.props.callMethod('fetchAttendees');
@@ -880,7 +888,11 @@ class AttendeeComponent extends PureComponent<Props, State> {
         const expandedRowRender = (dataSource:any) => {            
             console.log("expandedRowRender", dataSource);
             return (
-                <EditableFormTable propsData={dataSource} />
+                <EditableFormTable 
+                    propsData={dataSource} 
+                    XCSRFtoken={this.props.data.XCSRFtoken}
+                    parentEventData={this.props.data.parentEventData}
+                />
             );
         };
 
