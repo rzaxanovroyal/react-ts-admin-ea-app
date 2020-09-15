@@ -14,6 +14,7 @@ import {ViewState} from "../../store/view/reducer";
 import {catchError} from "../../shared/common-methods";
 import intl from "react-intl-universal";
 import {callMethod} from "../../store/view/actions";
+import { AutoComplete } from 'antd';
 
 // @ts-ignore
 const EditableContext = React.createContext();
@@ -370,28 +371,17 @@ class EditableTable extends PureComponent<Props, State> {
 
     const columns_cus:any[] = [
       {
-        title: () => {
-          return (
-              <Icon 
-                  type="usergroup-add" 
-                  theme="outlined" 
-                  onClick={()=>this.addParentItem()}
-                  style={{fontSize: '22px', color: 'rgba(176,31,95,1)'}}
-              />
-          )
-        },
-        // title: (text: any, record: any) => {
-        //   if (createAttendeeMode) {
-        //       return intl.get('EDIT')
-        //   } else {
-        //       return (
-        //           <Popover content={intl.get('ADD_ATTENDEE')} placement="left">
-        //               <Icon type="usergroup-add" theme="outlined" onClick={this.handleAdd}
-        //                     style={{fontSize: '22px', color: 'rgba(176,31,95,1)'}}/>
-        //           </Popover>
-        //       )
-        //   }
+        // title: () => {
+        //   return (
+        //       <Icon 
+        //           type="usergroup-add" 
+        //           theme="outlined" 
+        //           onClick={()=>this.addParentItem()}
+        //           style={{fontSize: '22px', color: 'rgba(176,31,95,1)'}}
+        //       />
+        //   )
         // },
+        title: "",
         dataIndex: 'operation',
         render: (text:any, record:any) => {
           const { editingKey } = this.state;

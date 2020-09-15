@@ -359,6 +359,7 @@ class App extends PureComponent<Props, State> {
                    "gender": JSON.parse(data.data[i].relationships[0]).gender,
                    "birth": JSON.parse(data.data[i].relationships[0]).birth,
                    "death": JSON.parse(data.data[i].relationships[0]).death,
+                   "id": JSON.parse(data.data[i].relationships[0]).id,
                    "parent": parents,
                },
                "id": JSON.parse(data.data[i].relationships[0]).id,

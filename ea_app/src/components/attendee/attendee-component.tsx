@@ -1,4 +1,4 @@
-import React, {AriaAttributes, DOMAttributes, PureComponent, createRef} from 'react';
+import React, {AriaAttributes, DOMAttributes, PureComponent, createRef, createElement} from 'react';
 import {connect} from 'react-redux';
 import {RootState} from "../../store/store";
 import {fetchPassword, fetchUsername, prodURL} from "../../shared/keys";
@@ -10,8 +10,9 @@ import {callMethod, toggleDrawer} from "../../store/view/actions";
 
 import {
     Form, Input, InputNumber, Popconfirm, Spin, 
-    Table, Tag, Popover, message, Icon, Select
+    Table, Tag, Popover, message, Icon, Select, Button
 } from 'antd';
+import Highlighter from 'react-highlight-words';
 import {FormComponentProps} from 'antd/es/form';
 import DrawerTagsComponent from "./drawer-tags-component"
 import {ViewState} from "../../store/view/reducer";
@@ -20,10 +21,11 @@ import LoaderComponent from "../loader-component";
 import styled from "styled-components";
 import intl from "react-intl-universal";
 
-import SearchBar from "material-ui-search-bar";
-import { filter } from 'lodash';
+// import SearchBar from "material-ui-search-bar";
+// import { filter } from 'lodash';
 
-import EditableFormTable from './expandable-editable-table';
+// import EditableFormTable from './expandable-editable-table';
+import EditableFormTable from './dropdown-paremt-item';
 
 const { Option } = Select;
 
@@ -168,6 +170,8 @@ type State = Readonly<{
     originDataSource: any[];
     pagination: any;
     searchValue: string;
+    searchText: string;
+    searchedColumn: string;
 }>;
 
 declare module 'react' {
@@ -180,11 +184,13 @@ const spinIcon = <Icon type="loading" style={{fontSize: 6, marginLeft: 7, margin
 
 class AttendeeComponent extends PureComponent<Props, State> {
     readonly myRef: React.RefObject<HTMLDivElement>;
+    searchInput: any;
 
     constructor(props: Props) {
         super(props);
 
         this.myRef = createRef<HTMLDivElement>();
+        this.searchInput = HTMLInputElement;
 
         this.state = {
             dataSource: [{
@@ -211,7 +217,9 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 current: 1,
                 pageSize: 10,
             },
-            searchValue: ''
+            searchValue: '',
+            searchText: '',
+            searchedColumn: '',
         };
     }
 
@@ -386,21 +394,52 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 }
             }
         })
-            .then(res => {
-                this.props.callMethod('fetchAttendees');
+            .then(res => {                
+                let newData:any = {
+                    key: this.state.originDataSource.length,
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: title,
+                    gender: gender,
+                    birth: birth,
+                    death: death,
+                    attendeeTags: [],
+                    parent: [],
+                    createParentMode: false
+                };
+                let data:any[] = this.state.originDataSource;
+                data.push(newData);
                 this.setState({
                     createAttendeeMode: false,
-                    fullscreenLoading: false
+                    fullscreenLoading: false,
+                    dataSource: data,
+                    editingRow: ''
                 });
-                console.log("res", res);
+                this.props.callMethod('fetchAttendees');
                 // window.location.reload();
             })
-            .catch(error => {
-                this.props.callMethod('fetchAttendees');
+            .catch(error => {          
+                let newData:any = {
+                    key: this.state.originDataSource.length,
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: title,
+                    gender: gender,
+                    birth: birth,
+                    death: death,
+                    attendeeTags: [],
+                    parent: [],
+                    createParentMode: false
+                };
+                let data:any[] = this.state.originDataSource;
+                data.push(newData);
                 this.setState({
                     createAttendeeMode: false,
-                    fullscreenLoading: false
+                    fullscreenLoading: false,
+                    dataSource: data,
+                    editingRow: ''
                 });
+                this.props.callMethod('fetchAttendees');
             });
     };
 
@@ -512,6 +551,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 gender: attendeeName.attributes.gender,
                 birth: attendeeName.attributes.birth,
                 death: attendeeName.attributes.death,
+                id: attendeeName.attributes.id,
                 attendeeTags: tags,
                 parent: attendeeName.attributes.parent,
                 createParentMode: false,
@@ -634,6 +674,73 @@ class AttendeeComponent extends PureComponent<Props, State> {
         });
     }
 
+    getColumnSearchProps = (dataIndex:any) => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }:any) => (
+          <div style={{ padding: 8 }}>
+            <Input
+              ref={(node:any) => {
+                this.searchInput = node;
+              }}
+              placeholder={`Search ${dataIndex}`}
+              value={selectedKeys[0]}
+              onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+              onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+              style={{ width: 188, marginBottom: 8, display: 'block' }}
+            />
+            <Button
+              type="primary"
+              onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+              icon="search"
+              size="small"
+              style={{ width: 90, marginRight: 8 }}
+            >
+              Search
+            </Button>
+            <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+              Reset
+            </Button>
+          </div>
+        ),
+        filterIcon: (filtered:any) => (
+          <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
+        ),
+        onFilter: (value:any, record:any[]) => (record[dataIndex]) ? 
+          record[dataIndex]
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase()) : false,
+        onFilterDropdownVisibleChange: (visible:any) => {
+          if (visible) {
+            setTimeout(() => this.searchInput.select());
+          }
+        },
+        render: (text:any) =>
+          this.state.searchedColumn === dataIndex ? (
+            <Highlighter
+              highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+              searchWords={[this.state.searchText]}
+              autoEscape
+              textToHighlight={(text) ? text.toString() : ""}
+            />
+          ) : (
+            text
+          ),
+    });
+
+    handleSearch = (selectedKeys:any, confirm:any, dataIndex:any) => {
+        confirm();
+        this.setState({
+          searchText: selectedKeys[0],
+          searchedColumn: dataIndex,
+        });
+    };
+
+    handleReset = (clearFilters:any) => {
+        clearFilters();
+        this.setState({ searchText: '' });
+    };
+    
+
     render() {
         const {createAttendeeMode} = this.state;
 
@@ -654,6 +761,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     }
                 },
                 key: 'edit',
+                width: 80,
                 render: (text, record) => {
                     const {editingRow} = this.state;
                     const editable = this.isEditing(record);
@@ -715,6 +823,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     return a.localeCompare(b);
                 },
                 sortDirections: ['ascend', 'descend'],
+                ...this.getColumnSearchProps('firstName'),
             },
             {
                 title: intl.get('LAST_NAME'),
@@ -728,11 +837,14 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     return a.localeCompare(b);
                 },
                 sortDirections: ['ascend', 'descend'],
+                ...this.getColumnSearchProps('lastName'),
             },
             {
-                title: intl.get('GENDER'),
+                // title: intl.get('GENDER'),
+                title: "M/F",
                 dataIndex: 'gender',
                 key: 'gender',
+                width: 75,
                 editable: true,
                 filters: [
                     { text: 'Male', value: 'M' },
@@ -751,6 +863,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     return a.localeCompare(b);
                 },
                 sortDirections: ['ascend', 'descend'],
+                ...this.getColumnSearchProps('birth'),
             },
             {
                 title: intl.get('DEATH'),
@@ -764,6 +877,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     return a.localeCompare(b);
                 },
                 sortDirections: ['ascend', 'descend'],
+                ...this.getColumnSearchProps('death'),
             },
             {
                 title: intl.get('EMAIL'),
@@ -776,6 +890,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     return a.localeCompare(b);
                 },
                 sortDirections: ['ascend', 'descend'],
+                ...this.getColumnSearchProps('email'),
             }, 
             {
                 title: intl.get('ATTENDEE_TAGS'),
@@ -885,11 +1000,13 @@ class AttendeeComponent extends PureComponent<Props, State> {
             };
         });
         
-        const expandedRowRender = (dataSource:any) => {            
-            console.log("expandedRowRender", dataSource);
+        const expandedRowRender = (record:any) => {
+            console.log("expandableRowRender", record);
             return (
                 <EditableFormTable 
-                    propsData={dataSource} 
+                    // propsData={dataSource}
+                    currentData={record}
+                    propsData={this.state.originDataSource} 
                     XCSRFtoken={this.props.data.XCSRFtoken}
                     parentEventData={this.props.data.parentEventData}
                 />
@@ -904,13 +1021,13 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 :
                 <React.Fragment>
                     <EditableContext.Provider value={this.props.form}>
-                        <div style={{width: "25%", marginLeft: "74%", marginTop: "-35px", marginBottom: "10px"}}>
+                        {/* <div style={{width: "25%", marginLeft: "74%", marginTop: "-35px", marginBottom: "10px"}}>
                             <SearchBar
                                 value={this.state.searchValue}
                                 onChange={(newValue) => this.onChangeSearch(newValue)}
                                 onCancelSearch={() => this.setState({searchValue: '', dataSource: this.state.originDataSource})}
                             />
-                        </div>
+                        </div> */}
                         <Table<Attendee>
                             components={components}
                             bordered
