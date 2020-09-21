@@ -81,12 +81,14 @@ type Props = OwnProps & ReturnType<typeof mapStateToProps>;
 type State = Readonly<{
     isLoading: boolean;
     initDone: boolean;
+    eventCode: string;
 }>;
 
 class App extends PureComponent<Props, State> {
     readonly state: State = {
         isLoading: true,
         initDone: false,
+        eventCode: '390822'
     };
 
     private getXCSRFToken = (): void => {
@@ -255,6 +257,8 @@ class App extends PureComponent<Props, State> {
         /*eslint no-undef: "error"*/
         // @ts-ignore
         await this.props.setAuthStatus(drupalSettings.isAnonymous);//false//drupalSettings.isAnonymous
+        // @ts-ignore
+        await this.setState({eventCode: drupalSettings.eventAccessCode});
         // @ts-ignore
         await this.props.setEventCode(drupalSettings.eventAccessCode);//'039214'//drupalSettings.eventAccessCode//'390822'
         // @ts-ignore
@@ -425,7 +429,8 @@ class App extends PureComponent<Props, State> {
                     >
                         <DataSearch
                             // value={drupalSettings.family_tree.eventAccessCode}
-                            value="390822"
+                            // @ts-ignore
+                            value={drupalSettings.eventAccessCode}
                             className="dataSearch"
                             dataField={["family_code"]}
                             componentId="Family Code"
