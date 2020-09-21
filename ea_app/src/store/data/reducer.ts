@@ -12,6 +12,9 @@ interface Data {
         field_first_name: string;
         field_last_name: string;
         title: string;
+        gender: string;
+        birth: string;
+        death: string;
     };
     relationships: {
         field_attendee_tags: {
@@ -70,6 +73,9 @@ export const initialState: DataState = {
                 field_last_name: 'empty',
                 field_first_name: 'empty',
                 title: 'empty',
+                gender: 'empty',
+                birth: 'empty',
+                death: 'empty'
             },
             relationships: {
                 field_attendee_tags: {

@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import {connect} from 'react-redux';
 import {RootState} from "../store/store";
-import {Form, Icon, Input, Modal, Spin, Table, Tag} from "antd";
+import {Form, Input, Modal, Spin, Table, Tag, Icon} from "antd";
 import {ColumnProps} from 'antd/es/table';
 import {FormComponentProps} from 'antd/es/form';
 import styled from "styled-components";

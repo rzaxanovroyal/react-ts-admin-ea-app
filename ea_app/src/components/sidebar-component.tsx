@@ -94,8 +94,8 @@ class SidebarComponent extends PureComponent<Props, State> {
                 </SidebarWrapper>
                 
                 <ComponentWrapper>
-                    <HeaderComponent/>
-                    {currentComponent}
+                    {/* <HeaderComponent/> */}
+                    <div style={{marginTop: "40px"}}>{currentComponent}</div>
                 </ComponentWrapper>
             </Wrapper>
         );
