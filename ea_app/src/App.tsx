@@ -88,7 +88,7 @@ class App extends PureComponent<Props, State> {
     readonly state: State = {
         isLoading: true,
         initDone: false,
-        eventCode: '390822'
+        eventCode: ''
     };
 
     private getXCSRFToken = (): void => {
@@ -255,14 +255,16 @@ class App extends PureComponent<Props, State> {
         this.getXCSRFToken();
         /*global drupalSettings:true*/
         /*eslint no-undef: "error"*/
+        // // @ts-ignore
+        // alert("drupalSettings.family_members.eventAccessCode" + drupalSettings.family_members.eventAccessCode);
         // @ts-ignore
-        await this.props.setAuthStatus(drupalSettings.isAnonymous);//false//drupalSettings.isAnonymous
+        await this.props.setAuthStatus(false);//false//drupalSettings.isAnonymous
         // @ts-ignore
-        await this.setState({eventCode: drupalSettings.eventAccessCode});
+        await this.setState({eventCode: drupalSettings.family_members.eventAccessCode});
         // @ts-ignore
-        await this.props.setEventCode(drupalSettings.eventAccessCode);//'039214'//drupalSettings.eventAccessCode//'390822'
+        await this.props.setEventCode(drupalSettings.family_members.eventAccessCode);//'039214'//drupalSettings.eventAccessCode//'390822'
         // @ts-ignore
-        await this.props.setLanguage(drupalSettings.language);//drupalSettings.language//'en'
+        await this.props.setLanguage(drupalSettings.family_members.language);//drupalSettings.language//'en'
         await this.fetchEventTags();
         await this.fetchAttendees();
         await this.fetchMomentTags();
@@ -406,8 +408,8 @@ class App extends PureComponent<Props, State> {
                 AntdLocale = enGB;
                 break;
             }
-        }
-        return (
+        }        
+        return this.state.eventCode.length ? ( 
             <>
                 {this.state.isLoading || !this.state.initDone ?
                     <LoaderWrapper>
@@ -429,8 +431,7 @@ class App extends PureComponent<Props, State> {
                     >
                         <DataSearch
                             // value={drupalSettings.family_tree.eventAccessCode}
-                            // @ts-ignore
-                            value={drupalSettings.eventAccessCode}
+                            value={this.state.eventCode}
                             className="dataSearch"
                             dataField={["family_code"]}
                             componentId="Family Code"
@@ -455,7 +456,7 @@ class App extends PureComponent<Props, State> {
                     </ReactiveBase>
                 </div>
             </>
-        );
+        ) : (<></>)
     }
 }
 

@@ -978,7 +978,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 },
             },
             {
-                title: intl.get('FIRST_NAME'),
+                // title: intl.get('FIRST_NAME'),
+                title: "First Name",
                 dataIndex: 'firstName',
                 key: 'firstName',
                 editable: true,
@@ -991,7 +992,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 ...this.getColumnSearchProps('firstName'),
             },
             {
-                title: intl.get('LAST_NAME'),
+                // title: intl.get('LAST_NAME'),
+                title: "Last Name",
                 dataIndex: 'lastName',
                 key: 'lastName',
                 editable: true,
