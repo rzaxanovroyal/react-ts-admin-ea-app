@@ -254,11 +254,11 @@ class App extends PureComponent<Props, State> {
         /*global drupalSettings:true*/
         /*eslint no-undef: "error"*/
         // @ts-ignore
-        await this.props.setAuthStatus(false);//false//drupalSettings.isAnonymous
+        await this.props.setAuthStatus(drupalSettings.isAnonymous);//false//drupalSettings.isAnonymous
         // @ts-ignore
-        await this.props.setEventCode('390822');//'039214'//drupalSettings.eventAccessCode//'390822'
+        await this.props.setEventCode(drupalSettings.eventAccessCode);//'039214'//drupalSettings.eventAccessCode//'390822'
         // @ts-ignore
-        await this.props.setLanguage('en');//drupalSettings.language//'en'
+        await this.props.setLanguage(drupalSettings.language);//drupalSettings.language//'en'
         await this.fetchEventTags();
         await this.fetchAttendees();
         await this.fetchMomentTags();

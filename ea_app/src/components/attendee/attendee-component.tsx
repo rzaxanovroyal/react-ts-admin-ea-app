@@ -10,7 +10,7 @@ import {callMethod, toggleDrawer} from "../../store/view/actions";
 
 import {
     Form, Input, InputNumber, Popconfirm, Spin, 
-    Table, Tag, Popover, message, Icon, Select, Button
+    Table, Tag, Popover, message, Icon, Select, Button, DatePicker
 } from 'antd';
 import Highlighter from 'react-highlight-words';
 import {FormComponentProps} from 'antd/es/form';
@@ -20,12 +20,14 @@ import {catchError} from "../../shared/common-methods";
 import LoaderComponent from "../loader-component";
 import styled from "styled-components";
 import intl from "react-intl-universal";
+import moment from 'moment';
 
 // import SearchBar from "material-ui-search-bar";
 // import { filter } from 'lodash';
 
 // import EditableFormTable from './expandable-editable-table';
 import EditableFormTable from './dropdown-paremt-item';
+import { RestaurantRounded } from '@material-ui/icons';
 
 const { Option } = Select;
 
@@ -172,6 +174,12 @@ type State = Readonly<{
     searchValue: string;
     searchText: string;
     searchedColumn: string;
+    submitFatherID: string;
+    submitMotherID: string;
+    newCreateBirth: string;
+    newCreaetDeath: string;
+    newCreateGender: string;
+    expandedRowKeys: any[];
 }>;
 
 declare module 'react' {
@@ -215,11 +223,17 @@ class AttendeeComponent extends PureComponent<Props, State> {
             originDataSource: [],
             pagination: {
                 current: 1,
-                pageSize: 10,
+                pageSize: 50,
             },
             searchValue: '',
             searchText: '',
             searchedColumn: '',
+            submitFatherID: '',
+            submitMotherID: '',
+            newCreateBirth: '',
+            newCreaetDeath: '',
+            newCreateGender: 'M',
+            expandedRowKeys: [],
         };
     }
 
@@ -270,6 +284,30 @@ class AttendeeComponent extends PureComponent<Props, State> {
 
     private updateAttendees = (attendeeID: string, newAttendee: newAttendee): void => {
         // console.log("save here", attendeeID, newAttendee)
+        let fatherID = this.state.submitFatherID, motherID = this.state.submitMotherID, parentData:any[] = [];
+        if (fatherID !== "") {
+            parentData.push(
+                {
+                    "type": "node--attendee",
+                    "id": fatherID,
+                    "meta": {
+                    "tid": 497
+                    }
+                }
+            )
+        }
+        if (motherID !== "") {
+            parentData.push(
+                {
+                    "type": "node--attendee",
+                    "id": motherID,
+                    "meta": {
+                    "tid": 497
+                    }
+                }
+            )
+        }
+        console.log("parentData", parentData);
         let modifiedNewAttendee:any = {
             "field_first_name": newAttendee.field_first_name,
             "field_full_name": newAttendee.field_full_name,
@@ -294,15 +332,50 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 "data": {
                     "type": "node--attendee",
                     "id": attendeeID,
-                    "attributes": modifiedNewAttendee
+                    "attributes": modifiedNewAttendee,
+                    "relationships": {
+                        "field_parents": {
+                            "data": parentData
+                        }
+                    }
                 }
             }
         })
             .then(res => {
                 this.props.callMethod('fetchAttendees');
                 // window.location.reload();
+                let originData:any[] = this.state.dataSource;
+                let index = parseInt(window.localStorage.getItem("cntUpdatedIndex") || "-1");
+                if(index > -1) {
+                    let newParent:any[] = [];
+                    for (let i = 0; i < parentData.length; i++) {
+                        let id = parentData[i].id;
+                        for (let j = 0; j < originData.length; j++) {
+                            if (id === originData[j].id) {
+                                let newParentItem:any = {
+                                    birth: originData[j].birth,
+                                    death: originData[j].death,
+                                    email: originData[j].email,
+                                    fname: originData[j].firstName,
+                                    gender: originData[j].gender,
+                                    id: id,
+                                    lname: originData[j].lastName
+                                }
+                                newParent.push(newParentItem);
+                            }
+                        }
+                    }
+                    originData[index].parent = newParent;
+                }
+                this.setState({dataSource: originData, originDataSource: originData});
+                console.log("updatedData", originData[index]);
+                alert(newAttendee.field_first_name + "'s data was updated successfully!");
             })
-            .catch(catchError);
+            .catch(
+                catchError => {
+                    alert("There is some error to update " + newAttendee.field_first_name + "'s data.")
+                }
+            );
     };
 
     isEditing = (record: any) => record.key === this.state.editingRow;
@@ -331,8 +404,9 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     ...row,
                 });
                 this.setState({dataSource: newData, editingRow: ''});
-                console.log("save", newData, key, index);
                 const updatedAttendee = newData[index];
+                console.log("updatedAttendee", updatedAttendee, index);
+                window.localStorage.setItem("cntUpdatedIndex", index.toString());
                 const newAttendee: newAttendee = {
                     field_first_name: updatedAttendee.firstName,
                     field_last_name: updatedAttendee.lastName,
@@ -340,10 +414,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     birth: updatedAttendee.birth,
                     death: updatedAttendee.death,
                     field_full_name: updatedAttendee.lastName ? `${updatedAttendee.firstName} ${updatedAttendee.lastName}` : updatedAttendee.firstName
-                };
-                
-                this.updateAttendees(attendeeID, newAttendee);
-                
+                };                
+                this.updateAttendees(attendeeID, newAttendee);                
             } else {
                 newData.push(row);
                 this.setState({dataSource: newData, editingRow: ''});
@@ -416,6 +488,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     editingRow: ''
                 });
                 this.props.callMethod('fetchAttendees');
+                alert(firstName + "'s data was created newly!");
                 // window.location.reload();
             })
             .catch(error => {          
@@ -440,6 +513,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     editingRow: ''
                 });
                 this.props.callMethod('fetchAttendees');
+                // alert("There is some error to create " + firstName + "'s data.")
             });
     };
 
@@ -447,17 +521,40 @@ class AttendeeComponent extends PureComponent<Props, State> {
         message.error(intl.get('EMAIL_IS_ALREADY_REGISTERED'));
     };
 
-    private createNewAttendee = (form: any, key: any): void => {
+    private createNewAttendee = (form: any, key: any): void => {        
         form.validateFields((error: any, row: any) => {
+            console.log("createNew", key, row, this.state.newCreateBirth, this.state.newCreaetDeath, this.state.newCreateGender);
+            // return;
             if (error) {
+                console.log("error", error, "493-line")
                 return;
             }
-            this.initiateRegister(row.email, row.firstName, row.lastName, row.gender, row.birth, row.death);
+            this.initiateRegister(row.email, row.firstName, row.lastName, this.state.newCreateGender, this.state.newCreateBirth, this.state.newCreaetDeath);
         });
     };
 
     edit(key: any) {
-        this.setState({editingRow: key});
+        let cntItem = this.state.originDataSource[key], fatherID = "", motherID = "";
+        if(key>-1) {
+            if (cntItem.parent.length) {
+                for (let i = 0; i < cntItem.parent.length; i++) {
+                    if (cntItem.parent[i].gender === "M") {
+                        fatherID = cntItem.parent[i].id;
+                    } else {
+                        motherID = cntItem.parent[i].id;
+                    }
+                }
+            }
+        }
+        let expandedRows:any[] = this.state.expandedRowKeys;
+        expandedRows.push(key);
+        console.log("edit", cntItem, key, expandedRows);
+        this.setState({
+            editingRow: key,
+            submitFatherID: fatherID,
+            submitMotherID: motherID,
+            expandedRowKeys: expandedRows
+        });
     }
 
     private initiateRegister = (enteredEmail: string, firstName: string, lastName: string, gender: string, birth: string, death: string): void => {
@@ -482,7 +579,11 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     this.setState({fullscreenLoading: true});
                     this.registerUser(enteredEmail, firstName, lastName, gender, birth, death);
                 } else {
-                    this.emailIsAlreadyRegistered();
+                    // this.emailIsAlreadyRegistered();
+                    // console.log("res", res.data);
+                    // const userID = res.data.uuid[0].value;
+                    const userID = res.data.data[0].id;
+                    this.createAttendeeNode(enteredEmail, firstName, lastName, userID, gender, birth, death)
                 }
             })
             .catch(catchError);
@@ -565,6 +666,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
     };
 
     private handleAdd = async () => {
+        document.getElementsByClassName("ant-table-body")[0].scrollTop = 0;
         const {dataSource} = this.state;
         const newData = {
             key: -1,
@@ -591,8 +693,17 @@ class AttendeeComponent extends PureComponent<Props, State> {
         this.setDataSource();
         const elements = document.getElementsByClassName("ant-table-hide-scrollbar");
         const element = elements[0] as HTMLElement;
-        element.style.overflow = "hidden";
-        element.style.marginBottom = "0px";
+        if(element) {
+            element.style.overflow = "hidden";
+            element.style.marginBottom = "0px";
+        }
+        const svgs = document.getElementsByTagName("svg");
+        for(let i = 0; i < svgs.length; i++) {
+            let svg = svgs[i] as SVGElement;
+            if (svg.dataset.icon === "filter") {
+                svg.style.color = "white";
+            }
+        }
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot ?: any): void {
@@ -649,7 +760,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 current: 1,
                 pageSize: parseInt(value)
             }
-        });
+        });        
     }
 
     onChangeSearch = (value:any) => {
@@ -702,7 +813,7 @@ class AttendeeComponent extends PureComponent<Props, State> {
           </div>
         ),
         filterIcon: (filtered:any) => (
-          <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
+          <Icon type="search" style={{ color: filtered ? 'white' : 'white' }} />
         ),
         onFilter: (value:any, record:any[]) => (record[dataIndex]) ? 
           record[dataIndex]
@@ -739,7 +850,61 @@ class AttendeeComponent extends PureComponent<Props, State> {
         clearFilters();
         this.setState({ searchText: '' });
     };
+
+    onDatePickerBirth = (date:any, dateString:any) => {
+        let data = this.state.dataSource, index = parseInt(this.state.editingRow);
+        if(index>-1) {
+            data[index].birth = dateString;
+            this.setState({dataSource:data});
+        } else {
+            this.setState({newCreateBirth: dateString});
+        }
+    }
+
+    onDatePickerDeath = (date:any, dateString:any) => {
+        let data = this.state.dataSource, index = parseInt(this.state.editingRow);
+        if(index>-1) {
+            data[index].death = dateString;
+            this.setState({dataSource:data});
+        } else {
+            this.setState({newCreaetDeath: dateString});
+        }
+    }
+
+    onGenderChange = (value:string) => {
+        let data = this.state.dataSource, index = parseInt(this.state.editingRow);
+        if(index>-1) {
+            data[index].gender = value;
+            this.setState({dataSource:data});
+        } else {
+            this.setState({newCreateGender: value});
+        }
+    }
+
+    updateSubmitFatherID = (id:string) => {
+        this.setState({submitFatherID: id});
+    }
     
+    updateSubmitMotherID = (id:string) => {
+        this.setState({submitMotherID: id});
+    }
+
+    onExpandRow = (expanded:boolean, record:any) => {
+        console.log("onExpandRow", expanded, record);
+        let expandedRows:any[] = this.state.expandedRowKeys;
+        if(expanded) {
+            expandedRows.push(record.key);
+        } else {
+            const index = expandedRows.indexOf(record.key);
+            if (index > -1) {
+                expandedRows.splice(index, 1);
+            }
+        }
+        console.log("expandedRowsKey", expandedRows)
+        this.setState({
+            expandedRowKeys: expandedRows
+        });
+    }
 
     render() {
         const {createAttendeeMode} = this.state;
@@ -844,18 +1009,29 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 title: "M/F",
                 dataIndex: 'gender',
                 key: 'gender',
-                width: 75,
-                editable: true,
+                width: 85,
+                // editable: true,
                 filters: [
                     { text: 'Male', value: 'M' },
                     { text: 'Female', value: 'F' },
                 ],
+                render: (text:any, record:any) => {
+                    const {editingRow} = this.state;
+                    return editingRow === record.key ? (
+                        <Select defaultValue={text ? text : "M"} style={{ width: "100%" }} onChange={this.onGenderChange}>
+                            <Option value="M">M</Option>
+                            <Option value="F">F</Option>
+                        </Select>
+                    ) : (
+                        <div>{text}</div>
+                    );
+                },  
             },
             {
                 title: intl.get('BIRTH'),
                 dataIndex: 'birth',
                 key: 'birth',
-                editable: true,
+                // editable: true,                
                 defaultSortOrder: 'ascend',
                 sorter: (a, b) => {
                     a = a.lastName || 'zzz';
@@ -864,12 +1040,32 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 },
                 sortDirections: ['ascend', 'descend'],
                 ...this.getColumnSearchProps('birth'),
+                render: (text:any, record:any) => {
+                    const {editingRow} = this.state;
+                    if(text) {
+                        return editingRow === record.key ? (                        
+                            <DatePicker 
+                                onChange={this.onDatePickerBirth} 
+                                defaultValue={moment(`${text}`, 'YYYY-MM-DD')}
+                            />
+                        ) : (
+                            <div>{text}</div>
+                        );
+                    }
+                    return editingRow === record.key ? (                        
+                        <DatePicker 
+                            onChange={this.onDatePickerBirth}
+                        />
+                    ) : (
+                        <div>{text}</div>
+                    );
+                },
             },
             {
                 title: intl.get('DEATH'),
                 dataIndex: 'death',
                 key: 'death',
-                editable: true,
+                // editable: true,
                 defaultSortOrder: 'ascend',
                 sorter: (a, b) => {
                     a = a.lastName || 'zzz';
@@ -878,6 +1074,26 @@ class AttendeeComponent extends PureComponent<Props, State> {
                 },
                 sortDirections: ['ascend', 'descend'],
                 ...this.getColumnSearchProps('death'),
+                render: (text:any, record:any) => {
+                    const {editingRow} = this.state;
+                    if(text) {
+                        return editingRow === record.key ? (
+                            <DatePicker 
+                                onChange={this.onDatePickerDeath} 
+                                defaultValue={moment(`${text}`, 'YYYY-MM-DD')}
+                            />
+                        ) : (
+                            <div>{text}</div>
+                        );
+                    }
+                    return editingRow === record.key ? (
+                        <DatePicker 
+                            onChange={this.onDatePickerDeath}
+                        />
+                    ) : (
+                        <div>{text}</div>
+                    );
+                },
             },
             {
                 title: intl.get('EMAIL'),
@@ -1000,8 +1216,8 @@ class AttendeeComponent extends PureComponent<Props, State> {
             };
         });
         
-        const expandedRowRender = (record:any) => {
-            console.log("expandableRowRender", record);
+        const expandedRowRender = (record:any, index:any, indent:any, expanded:any) => {
+            console.log("expandableRowRender", record, index, indent, expanded);
             return (
                 <EditableFormTable 
                     // propsData={dataSource}
@@ -1009,6 +1225,10 @@ class AttendeeComponent extends PureComponent<Props, State> {
                     propsData={this.state.originDataSource} 
                     XCSRFtoken={this.props.data.XCSRFtoken}
                     parentEventData={this.props.data.parentEventData}
+                    editingRow={this.state.editingRow}
+                    rootRecord={record.key}
+                    updateFatherID={this.updateSubmitFatherID}
+                    updateMotherID={this.updateSubmitMotherID}
                 />
             );
         };
@@ -1041,11 +1261,16 @@ class AttendeeComponent extends PureComponent<Props, State> {
                             pagination={this.state.pagination}
                             onChange={this.handleTableChange}
                             expandedRowRender={expandedRowRender}
+                            // defaultExpandAllRows={false}
+                            // defaultExpandedRowKeys={[1]}
+                            // expandedRowKeys={this.state.expandedRowKeys}
+                            // onExpand={this.onExpandRow}
+                            // onExpandedRowsChange={(expandedRows)=>{console.log("expandedRows", expandedRows)}}
                             scroll={{ y: 600 }}
                             id="parent-table"
                         />
                         <div style={{textAlign: "right", marginTop: "-47px"}}>
-                            <Select defaultValue="10" style={{ width: 120 }} onChange={this.handleChange}>
+                            <Select defaultValue={"50 / page"} style={{ width: 120 }} onChange={this.handleChange}>
                                 <Option value="10">10 / page</Option>
                                 <Option value="20">20 / page</Option>
                                 <Option value="50">50 / page</Option>
